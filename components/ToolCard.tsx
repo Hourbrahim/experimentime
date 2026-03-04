@@ -10,18 +10,18 @@ export function ToolCard({ tool }: { tool: Tool }) {
   return (
     <Link
       href={`/tools/${tool.slug}`}
-      className="group block rounded-2xl border border-zinc-200 bg-white p-6 transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10"
+      className="group block overflow-hidden rounded-xl border border-zinc-200/70 bg-white/60 p-4 text-xs transition duration-200 ease-out hover:border-zinc-900/40 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="truncate text-base font-semibold tracking-tight text-zinc-950">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <div className="truncate text-[13px] font-medium uppercase tracking-[0.18em] text-zinc-700 group-hover:text-zinc-900">
             {tool.name}
           </div>
-          <div className="mt-2 text-sm leading-6 text-zinc-600">
+          <div className="text-[11px] leading-5 text-zinc-500 group-hover:text-zinc-700">
             {tool.status === "placeholder" ? "Coming soon." : tool.description}
           </div>
         </div>
-        <span className="shrink-0 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600">
+        <span className="shrink-0 rounded-full border border-zinc-200/80 bg-zinc-50 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-500">
           {statusLabel[tool.status]}
         </span>
       </div>
