@@ -7,9 +7,11 @@ const statusLabel: Record<Tool["status"], string> = {
 };
 
 export function ToolCard({ tool }: { tool: Tool }) {
+  const href = tool.embedSrc ?? `/tools/${tool.slug}`;
+
   return (
     <Link
-      href={`/tools/${tool.slug}`}
+      href={href}
       className="group block overflow-hidden rounded-xl border border-zinc-200/70 bg-white/60 p-4 text-xs transition duration-200 ease-out hover:border-zinc-900/40 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10"
     >
       <div className="flex items-start justify-between gap-3">
