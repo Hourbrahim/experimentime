@@ -1,0 +1,253 @@
+:root {
+    --bg-color: #ffffff;
+    --sidebar-bg: #ffffff;
+    --accent-color: #000000;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --border-color: #e0e0e0;
+    --border-heavy: #000000;
+    --font-header: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-transform: uppercase;
+    /* Minimalist look */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    overflow: hidden;
+    height: 100vh;
+}
+
+#app-container {
+    display: flex;
+    height: 100%;
+}
+
+#sidebar {
+    width: 300px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-heavy);
+    padding: 2rem 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    z-index: 10;
+}
+
+header h1 {
+    font-family: var(--font-header);
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    margin-bottom: 0.5rem;
+}
+
+header .version {
+    font-size: 0.7rem;
+    vertical-align: top;
+    opacity: 0.5;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.control-group h3 {
+    font-family: var(--font-header);
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-heavy);
+    padding-bottom: 0.5rem;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.control-item.row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.control-item label {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.control-item span {
+    font-size: 0.7rem;
+    align-self: flex-end;
+    font-family: monospace;
+}
+
+input[type="range"] {
+    appearance: none;
+    width: 100%;
+    height: 1px;
+    background: var(--border-heavy);
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid white;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    width: 30px;
+    height: 14px;
+    border: 1px solid var(--border-heavy);
+    position: relative;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--accent-color);
+}
+
+input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: white;
+    top: 1px;
+    left: 1px;
+    transition: left 0.2s;
+}
+
+input[type="checkbox"]:checked::after {
+    left: 17px;
+    background: white;
+}
+
+select {
+    background: white;
+    border: 1px solid var(--border-heavy);
+    color: black;
+    padding: 6px;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    outline: none;
+    cursor: pointer;
+}
+
+.upload-area {
+    border: 1px dashed var(--border-heavy);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.upload-area p {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+}
+
+.upload-area .light {
+    opacity: 0.4;
+}
+
+.upload-area:hover {
+    background: #f5f5f5;
+}
+
+.bw-btn {
+    background: black;
+    color: white;
+    border: 1px solid black;
+    padding: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.bw-btn:hover {
+    background: white;
+    color: black;
+}
+
+.bw-btn.recording {
+    background: red;
+    border-color: red;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+#record-status {
+    font-size: 0.6rem;
+    text-align: center;
+    margin-top: 0.5rem;
+    letter-spacing: 1px;
+    opacity: 0.6;
+}
+
+#canvas-wrapper {
+    flex: 1;
+    background: #fcfcfc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+}
+
+/* The Frame Stroke requested by user */
+#canvas-wrapper canvas {
+    box-shadow: 0 0 0 1px #000;
+    /* Minimal stroke to show limit */
+    max-width: 100%;
+    max-height: 100%;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: black;
+}

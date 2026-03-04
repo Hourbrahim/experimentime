@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Char Carpet Animator</title>
+  <meta name="description"
+    content="Interactive character carpet pattern generator — animated grid of characters with mathematical color patterns." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Open+Sans:wght@300;400;600;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ─── Sidebar Controls ─── -->
+  <aside id="sidebar">
+
+    <div class="sidebar-title">
+      <h1>Char<br />Carpet<br />Animator.</h1>
+      <div class="title-rule"></div>
+    </div>
+
+    <!-- Aspect Ratio -->
+    <div class="control-group">
+      <label class="group-label">Ratio</label>
+      <div class="btn-row ratio-row">
+        <button class="btn btn-ratio active" data-ratio="1:1">1:1</button>
+        <button class="btn btn-ratio" data-ratio="4:3">4:3</button>
+        <button class="btn btn-ratio" data-ratio="3:4">3:4</button>
+        <button class="btn btn-ratio" data-ratio="9:16">9:16</button>
+      </div>
+    </div>
+
+    <!-- Download / Export -->
+    <div class="control-group">
+      <label class="group-label">Export</label>
+      <div class="btn-row">
+        <button id="btn-png" class="btn btn-primary">PNG</button>
+        <button id="btn-gif" class="btn btn-accent">GIF Loop</button>
+        <button id="btn-webm" class="btn btn-accent">WebM</button>
+      </div>
+      <div id="export-status" class="export-status"></div>
+    </div>
+
+    <!-- 2D Pad -->
+    <div class="control-group">
+      <label class="group-label">2D Pad <span id="pad-readout" class="readout">(200, 200)</span></label>
+      <div id="pad-container" class="pad-container">
+        <div id="pad-dot" class="pad-dot"></div>
+      </div>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="control-group">
+      <label class="group-label">Input Mode</label>
+      <div class="btn-row mode-row">
+        <button id="btn-mode-text" class="btn btn-ratio active" data-mode="text">Text / Glyphs</button>
+        <button id="btn-mode-emoji" class="btn btn-ratio" data-mode="emoji">Emoji Mode</button>
+      </div>
+    </div>
+
+    <!-- Char input -->
+    <div id="section-text" class="control-group">
+      <label class="group-label" for="char-input">Characters</label>
+      <input type="text" id="char-input" value="A" maxlength="10" />
+    </div>
+
+    <!-- Emoji Grid (hidden by default) -->
+    <div id="section-emoji" class="control-group hidden">
+      <label class="group-label">Quick Emojis</label>
+      <div class="emoji-grid">
+        <button class="emoji-btn">🔥</button>
+        <button class="emoji-btn">✨</button>
+        <button class="emoji-btn">❤️</button>
+        <button class="emoji-btn">🌊</button>
+        <button class="emoji-btn">🍄</button>
+        <button class="emoji-btn">👁️</button>
+        <button class="emoji-btn">🌈</button>
+        <button class="emoji-btn">⚡</button>
+        <button class="emoji-btn">🧊</button>
+        <button class="emoji-btn">☁️</button>
+        <button class="emoji-btn">🌸</button>
+        <button class="emoji-btn">💎</button>
+      </div>
+    </div>
+
+    <!-- Font Selector -->
+    <div id="section-font" class="control-group">
+      <label class="group-label">Font Style</label>
+      <select id="font-selector" class="dropdown">
+        <option value="Open Sans">Open Sans (Clean)</option>
+        <option value="Playfair Display">Playfair (Elegant)</option>
+        <option value="Space Mono">Space Mono (Retro)</option>
+        <option value="Bungee">Bungee (Bold)</option>
+        <option value="Pacifico">Pacifico (Script)</option>
+        <option value="sans-serif">System Sans</option>
+        <option value="serif">System Serif</option>
+      </select>
+    </div>
+
+    <!-- Colors -->
+    <div class="control-group">
+      <label class="group-label">Colors</label>
+      <div class="color-row">
+        <div class="color-pair">
+          <label class="color-label">BG</label>
+          <input type="color" id="color-bg" value="#000000" />
+        </div>
+        <div class="color-pair">
+          <label class="color-label">Text</label>
+          <input type="color" id="color-text" value="#ffffff" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="control-group">
+      <label class="group-label">Font Size <span id="val-f" class="readout">42</span></label>
+      <input type="range" id="slider-f" min="10" max="200" step="1" value="42" />
+    </div>
+
+    <div class="control-group">
+      <label class="group-label">Intensity <span id="val-a" class="readout">7.772</span></label>
+      <input type="range" id="slider-a" min="0" max="100" step="0.001" value="7.772" />
+    </div>
+
+    <div class="control-group">
+      <label class="group-label">Wave Freq <span id="val-b" class="readout">0.199</span></label>
+      <input type="range" id="slider-b" min="0.1" max="1" step="0.001" value="0.199111" />
+    </div>
+
+    <div class="control-group">
+      <label class="group-label">Modulation <span id="val-c" class="readout">0.00998</span></label>
+      <input type="range" id="slider-c" min="0.0001" max="0.01" step="0.0001" value="0.009981199" />
+    </div>
+
+    <div class="control-group">
+      <label class="group-label">Speed (D) <span id="val-d" class="readout">3.899</span></label>
+      <input type="range" id="slider-d" min="0" max="10" step="0.001" value="3.899" />
+    </div>
+
+    <div class="control-group">
+      <label class="group-label">Spacing (E) <span id="val-e" class="readout">20</span></label>
+      <input type="range" id="slider-e" min="1" max="100" step="1" value="20" />
+    </div>
+
+  </aside>
+
+  <!-- ─── Canvas Container ─── -->
+  <main id="canvas-container"></main>
+
+  <!-- P5.js -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+  <script src="sketch.js"></script>
+</body>
+
+</html>

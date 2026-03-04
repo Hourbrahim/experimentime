@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mdbrd</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='6' fill='%23fff'/%3E%3Cpath d='M9 0v32M20 0v32M26 0v32M0 11h32M0 18h32M0 25h32' stroke='%23111' stroke-width='1.5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+  <div id="panel">
+
+    <!-- ── Header ── -->
+    <div class="pn-title">mdbrd</div>
+    <div class="pn-div"></div>
+
+    <!-- ── Files ── -->
+    <div class="pn-section">
+      <div class="pn-row">
+        <button class="tb-btn green pn-flex" id="btn-upload" style="display:flex;align-items:center;justify-content:center;gap:5px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload
+        </button>
+        <button class="tb-btn blue pn-flex" id="btn-shuffle" title="Shuffle layout  [Space]" style="display:flex;align-items:center;justify-content:center;gap:5px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8"/>
+            <line x1="4" y1="20" x2="21" y2="3"/>
+            <polyline points="21 16 21 21 16 21"/>
+            <line x1="15" y1="15" x2="21" y2="21"/>
+          </svg>
+          Shuffle
+        </button>
+      </div>
+    </div>
+
+    <div class="pn-div"></div>
+
+    <!-- ── Layout ── -->
+    <div class="pn-section">
+      <div class="pn-section-head">
+        <span class="pn-label">Layout</span>
+        <button class="tb-btn icon" id="btn-layout-orient" title="Toggle layout orientation">
+          <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round">
+            <rect x="1" y="4.5" width="16" height="9" rx="1.5"/>
+          </svg>
+        </button>
+      </div>
+      <div class="pn-row">
+        <button class="tb-btn pn-flex" id="btn-layout-structured">Masonry</button>
+        <button class="tb-btn pn-flex" id="btn-layout-rows">Rows</button>
+        <button class="tb-btn pn-flex" id="btn-layout-bricks">Bricks</button>
+      </div>
+      <div class="pn-row">
+        <button class="tb-btn pn-flex" id="btn-layout-cloud">Cloud</button>
+        <button class="tb-btn pn-flex" id="btn-layout-cloudbricks">Cloud+</button>
+        <button class="tb-btn pn-flex" id="btn-layout-scatter">Scatter</button>
+      </div>
+      <label class="pn-colrow" id="colrow-wrap">
+        <span class="pn-colrow-lbl" id="colrow-label">Cols</span>
+        <input type="number" id="colrow-input" class="pn-num" min="0" max="20" placeholder="auto"
+          title="0 = auto">
+        <span class="pn-colrow-lbl">Gap</span>
+        <input type="number" id="gap-input" class="pn-num" min="0" max="500" placeholder="0"
+          title="Gap between pictures (px)">
+      </label>
+    </div>
+
+    <div class="pn-div"></div>
+
+    <!-- ── Canvas ── -->
+    <div class="pn-section">
+      <div class="pn-section-head">
+        <span class="pn-label">Canvas</span>
+        <button class="tb-btn icon" id="btn-orient" title="Toggle canvas orientation">
+          <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round">
+            <rect x="1" y="4.5" width="16" height="9" rx="1.5"/>
+          </svg>
+        </button>
+      </div>
+      <select class="tb-select pn-full" id="ratio-sel">
+        <option value="16:9">16:9</option>
+        <option value="1:1">1:1</option>
+        <option value="4:5">4:5</option>
+        <option value="3:4">3:4</option>
+        <option value="1:2">1:2</option>
+        <option value="A4">A4</option>
+        <option value="Letter">Letter</option>
+        <option value="Free">Free</option>
+      </select>
+      <span class="pn-dim-clickable" id="dim-display">1920 × 1080</span>
+    </div>
+
+    <div class="pn-div"></div>
+
+    <!-- ── Background ── -->
+    <div class="pn-section">
+      <div class="pn-row pn-vcenter">
+        <span class="pn-label" style="flex:1">Background</span>
+        <input type="color" id="bg-color" class="color-swatch" value="#ffffff" title="Background color">
+      </div>
+    </div>
+
+    <div class="pn-div"></div>
+
+    <!-- ── Board ── -->
+    <div class="pn-section">
+      <div class="pn-row">
+        <button class="tb-btn pn-flex" id="btn-snap">Snap</button>
+        <button class="tb-btn pn-flex" id="btn-undo" disabled>Undo</button>
+      </div>
+      <div class="pn-row">
+        <button class="tb-btn pn-flex" id="btn-select-all">Select All</button>
+        <button class="tb-btn danger pn-flex" id="btn-clear">Clear</button>
+      </div>
+      <span class="pn-sel-count" id="sel-count"></span>
+    </div>
+
+    <!-- ── Image actions (shown when selected) ── -->
+    <div class="pn-div" id="img-act-sep" style="display:none"></div>
+    <div id="img-act-section" class="pn-section" style="display:none">
+      <div class="pn-label" style="margin-bottom:2px">Image</div>
+      <div class="pn-row">
+        <button class="tb-btn icon pn-flex" id="btn-rotate" title="Rotate 90° CW  [R]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+            <path d="M21 3v5h-5"/>
+          </svg>
+        </button>
+        <button class="tb-btn icon pn-flex" id="btn-flip-h" title="Flip horizontal  [H]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18"/><path d="m8 7-4 5 4 5"/><path d="m16 7 4 5-4 5"/>
+          </svg>
+        </button>
+        <button class="tb-btn icon pn-flex" id="btn-flip-v" title="Flip vertical  [V]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h18"/><path d="m7 8 5-4 5 4"/><path d="m7 16 5 4 5-4"/>
+          </svg>
+        </button>
+        <button class="tb-btn icon pn-flex" id="btn-crop" title="Crop  [C] — Enter to apply, Esc to cancel" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2v14h14"/><path d="M2 6h14v14"/>
+          </svg>
+        </button>
+        <button class="tb-btn icon pn-flex danger" id="btn-delete" title="Delete selected">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="pn-row">
+        <button class="tb-btn icon pn-flex" id="btn-z-bottom" title="Send to back  [Alt+Shift+↓]">↓↓</button>
+        <button class="tb-btn icon pn-flex" id="btn-z-down"   title="Move backward  [Alt+↓]">↓</button>
+        <button class="tb-btn icon pn-flex" id="btn-z-up"     title="Move forward  [Alt+↑]">↑</button>
+        <button class="tb-btn icon pn-flex" id="btn-z-top"    title="Bring to front  [Alt+Shift+↑]">↑↑</button>
+      </div>
+    </div>
+
+    <div class="pn-div"></div>
+
+    <!-- ── View ── -->
+    <div class="pn-section">
+      <div class="pn-row pn-vcenter">
+        <button class="tb-btn pn-flex" id="btn-fit">Fit</button>
+        <button class="tb-btn icon" id="btn-zout">−</button>
+        <span id="zoom-val" class="pn-zoom">100%</span>
+        <button class="tb-btn icon" id="btn-zin">+</button>
+      </div>
+    </div>
+
+    <div class="pn-div"></div>
+
+    <!-- ── Export ── -->
+    <div class="pn-section">
+      <div class="pn-row">
+        <select class="tb-select pn-flex" id="export-fmt" title="Export format">
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+          <option value="webp">WEBP</option>
+          <option value="pdf">PDF</option>
+        </select>
+        <button class="tb-btn icon accent" id="btn-export" title="Export HD">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- pushes theme to bottom -->
+    <div class="pn-spacer"></div>
+
+    <!-- ── Theme ── -->
+    <div class="pn-section">
+      <div class="pn-row">
+        <button class="tb-btn icon pn-flex" id="btn-theme-light" title="Light Mode">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2"/><path d="M12 20v2"/>
+            <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+            <path d="M2 12h2"/><path d="M20 12h2"/>
+            <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+          </svg>
+        </button>
+        <button class="tb-btn icon pn-flex" id="btn-theme-dark" title="Dark Mode">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Shortcuts hint button -->
+    <button id="btn-shortcuts" title="Show keyboard shortcuts">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="3"/>
+        <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/>
+      </svg>
+      shortcuts
+    </button>
+
+    <!-- Drag handle to resize panel -->
+    <div id="panel-resize"></div>
+
+  </div><!-- /#panel -->
+
+  <div id="size-panel">
+    <div class="sp-row">
+      <label class="sp-label">Width</label>
+      <input type="number" id="sp-w" class="sp-input" min="100" max="8000">
+      <span class="sp-unit">px</span>
+    </div>
+    <div class="sp-row">
+      <label class="sp-label">Height</label>
+      <input type="number" id="sp-h" class="sp-input" min="100" max="8000">
+      <span class="sp-unit">px</span>
+    </div>
+    <div class="sp-btns">
+      <button class="tb-btn" id="sp-cancel">Cancel</button>
+      <button class="tb-btn accent" id="sp-apply">Apply</button>
+    </div>
+  </div>
+
+  <div id="drop-ov">
+    <div class="drop-box">
+      <h2>Drop to add images</h2>
+      <p>JPG · PNG · WEBP</p>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple>
+  <div id="toast"></div>
+
+  <div id="page-bar">
+    <div id="page-tabs"></div>
+    <button id="btn-add-page" title="Add page">+</button>
+  </div>
+
+  <!-- ── Shortcuts / Welcome overlay ── -->
+  <div id="welcome">
+    <div id="welcome-card">
+      <div class="wc-header">
+        <div>
+          <div class="wc-title">mdbrd</div>
+          <div class="wc-sub">Keyboard shortcuts</div>
+        </div>
+        <button id="wc-close">✕</button>
+      </div>
+      <div class="wc-grid">
+        <div class="wc-col">
+          <div class="wc-group">Canvas</div>
+          <div class="wc-row"><kbd>Space</kbd><span>Shuffle layout</span></div>
+          <div class="wc-row"><kbd>F</kbd><span>Fit to screen</span></div>
+          <div class="wc-row"><kbd>Ctrl A</kbd><span>Select all</span></div>
+          <div class="wc-row"><kbd>Ctrl Z</kbd><span>Undo</span></div>
+          <div class="wc-row"><kbd>Del</kbd><span>Delete selected</span></div>
+        </div>
+        <div class="wc-col">
+          <div class="wc-group">Image</div>
+          <div class="wc-row"><kbd>R</kbd><span>Rotate 90°</span></div>
+          <div class="wc-row"><kbd>H</kbd><span>Flip horizontal</span></div>
+          <div class="wc-row"><kbd>V</kbd><span>Flip vertical</span></div>
+          <div class="wc-row"><kbd>C</kbd><span>Crop</span></div>
+          <div class="wc-row"><kbd>Alt ↑</kbd><span>Move forward</span></div>
+          <div class="wc-row"><kbd>Alt ↓</kbd><span>Move backward</span></div>
+          <div class="wc-row"><kbd>Alt ⇧ ↑</kbd><span>Bring to front</span></div>
+          <div class="wc-row"><kbd>Alt ⇧ ↓</kbd><span>Send to back</span></div>
+        </div>
+      </div>
+      <div class="wc-footer">
+        <span class="wc-hint">Crop mode: Enter to apply · Esc to cancel</span>
+        <button id="wc-ok" class="tb-btn accent">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
