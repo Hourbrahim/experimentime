@@ -1,10 +1,10 @@
-import { state }                                        from './state.js';
-import { PANEL_W, SNAP_GRID, MIN_ZOOM, MAX_ZOOM }        from './config.js';
-import { doZoom, fitScreen }                            from './viewport.js';
-import { saveState, restoreState }                      from './undo.js';
-import { snapPos }                                      from './snap.js';
-import { initFilesP5, removeSelected }                  from './files.js';
-import { initExportP5 }                                 from './export.js';
+import { state } from './state.js';
+import { PANEL_W, SNAP_GRID, MIN_ZOOM, MAX_ZOOM } from './config.js';
+import { doZoom, fitScreen } from './viewport.js';
+import { saveState, restoreState } from './undo.js';
+import { snapPos } from './snap.js';
+import { initFilesP5, removeSelected } from './files.js';
+import { initExportP5 } from './export.js';
 import {
   initUI, updateDimDisplay, hideSizePanel,
   updateSelectionUI, selectAll, syncPageUI,
@@ -22,7 +22,7 @@ export function createSketch(p) {
   p.setup = function () {
     const cnv = p.createCanvas(p.windowWidth, p.windowHeight);
     cnv.style('position', 'fixed');
-    cnv.style('top',  '0');
+    cnv.style('top', '0');
     cnv.style('left', '0');
     cnv.style('z-index', '0');
     p.imageMode(p.CORNER);
@@ -68,7 +68,7 @@ export function createSketch(p) {
     }
 
     // Artboard fill (no shadow)
-    p.drawingContext.shadowBlur  = 0;
+    p.drawingContext.shadowBlur = 0;
     p.drawingContext.shadowColor = 'transparent';
     p.fill(state.bgColor);
     p.noStroke();
@@ -182,13 +182,13 @@ export function createSketch(p) {
   }
 
   function drawSnapGrid() {
-    const x1 = (0                             - state.panX) / state.zoomLevel;
-    const y1 = (0                             - state.panY) / state.zoomLevel;
-    const x2 = (p.windowWidth - getPanelW()   - state.panX) / state.zoomLevel;
-    const y2 = (p.windowHeight                - state.panY) / state.zoomLevel;
+    const x1 = (0 - state.panX) / state.zoomLevel;
+    const y1 = (0 - state.panY) / state.zoomLevel;
+    const x2 = (p.windowWidth - getPanelW() - state.panX) / state.zoomLevel;
+    const y2 = (p.windowHeight - state.panY) / state.zoomLevel;
     if (((x2 - x1) / SNAP_GRID) * ((y2 - y1) / SNAP_GRID) > 6000) return;
     p.noStroke(); p.fill(255, 255, 255, 16);
-    const r  = 1.5 / state.zoomLevel;
+    const r = 1.5 / state.zoomLevel;
     const sx = Math.floor(x1 / SNAP_GRID) * SNAP_GRID;
     const sy = Math.floor(y1 / SNAP_GRID) * SNAP_GRID;
     for (let gx = sx; gx <= x2; gx += SNAP_GRID)
@@ -200,16 +200,16 @@ export function createSketch(p) {
     p.stroke(180);
     p.strokeWeight(1.5 / state.zoomLevel);
     const arm = 18 / state.zoomLevel;
-    const gap =  8 / state.zoomLevel;
+    const gap = 8 / state.zoomLevel;
     const { x, y, w, h } = state.artboard;
-    p.line(x - gap - arm, y,     x - gap,           y);
-    p.line(x,             y - gap - arm, x,          y - gap);
-    p.line(x + w + gap,   y,     x + w + gap + arm,  y);
-    p.line(x + w,         y - gap - arm, x + w,      y - gap);
-    p.line(x - gap - arm, y + h, x - gap,            y + h);
-    p.line(x,             y + h + gap,   x,           y + h + gap + arm);
-    p.line(x + w + gap,   y + h, x + w + gap + arm,  y + h);
-    p.line(x + w,         y + h + gap,   x + w,       y + h + gap + arm);
+    p.line(x - gap - arm, y, x - gap, y);
+    p.line(x, y - gap - arm, x, y - gap);
+    p.line(x + w + gap, y, x + w + gap + arm, y);
+    p.line(x + w, y - gap - arm, x + w, y - gap);
+    p.line(x - gap - arm, y + h, x - gap, y + h);
+    p.line(x, y + h + gap, x, y + h + gap + arm);
+    p.line(x + w + gap, y + h, x + w + gap + arm, y + h);
+    p.line(x + w, y + h + gap, x + w, y + h + gap + arm);
   }
 
   function drawArtboardHandles() {
@@ -259,15 +259,15 @@ export function createSketch(p) {
 
   function rectsOverlap(a, b) {
     return a.x < b.x + b.w && a.x + a.w > b.x &&
-           a.y < b.y + b.h && a.y + a.h > b.y;
+      a.y < b.y + b.h && a.y + a.h > b.y;
   }
 
   function drawImage(im) {
     p.push();
     p.translate(im.x + im.w / 2, im.y + im.h / 2);
     if (im.rotation) p.rotate(im.rotation * Math.PI / 180);
-    if (im.flipX)    p.scale(-1,  1);
-    if (im.flipY)    p.scale( 1, -1);
+    if (im.flipX) p.scale(-1, 1);
+    if (im.flipY) p.scale(1, -1);
     p.imageMode(p.CENTER);
     // For 90°/270° the draw dimensions must be swapped so the image fills the
     // (already-swapped) slot — drawing (w,h) in a 90°-rotated frame occupies
@@ -297,10 +297,10 @@ export function createSketch(p) {
     // Dark mask outside crop rect
     p.noStroke();
     p.fill(0, 0, 0, 140);
-    p.rect(im.x,      im.y,      im.w,         ry - im.y);
-    p.rect(im.x,      ry + rh,   im.w,         im.y + im.h - ry - rh);
-    p.rect(im.x,      ry,        rx - im.x,    rh);
-    p.rect(rx + rw,   ry,        im.x + im.w - rx - rw, rh);
+    p.rect(im.x, im.y, im.w, ry - im.y);
+    p.rect(im.x, ry + rh, im.w, im.y + im.h - ry - rh);
+    p.rect(im.x, ry, rx - im.x, rh);
+    p.rect(rx + rw, ry, im.x + im.w - rx - rw, rh);
 
     // Crop border
     p.noFill();
@@ -328,12 +328,12 @@ export function createSketch(p) {
     if (!state.cropRect) return null;
     const cr = state.cropRect;
     const rx = im.x + cr.x * im.w, ry = im.y + cr.y * im.h;
-    const rw = cr.w * im.w,        rh = cr.h * im.h;
-    const t  = 14 / state.zoomLevel;
+    const rw = cr.w * im.w, rh = cr.h * im.h;
+    const t = 14 / state.zoomLevel;
     const corners = [
-      { n: 'tl', x: rx,      y: ry      },
-      { n: 'tr', x: rx + rw, y: ry      },
-      { n: 'bl', x: rx,      y: ry + rh },
+      { n: 'tl', x: rx, y: ry },
+      { n: 'tr', x: rx + rw, y: ry },
+      { n: 'bl', x: rx, y: ry + rh },
       { n: 'br', x: rx + rw, y: ry + rh },
     ];
     for (const c of corners)
@@ -344,15 +344,15 @@ export function createSketch(p) {
   function applyCrop() {
     const im = state.imgs.find(i => i.id === state.cropTarget);
     if (im && state.cropRect) {
-      const cr  = state.cropRect;
+      const cr = state.cropRect;
       const EPS = 0.005;
       const nativeAr = im.p5img.width / im.p5img.height;
-      const rot      = im.rotation || 0;
-      const swapped  = rot === 90 || rot === 270;
+      const rot = im.rotation || 0;
+      const swapped = rot === 90 || rot === 270;
 
       if (cr.x < EPS && cr.y < EPS && cr.w > 1 - EPS && cr.h > 1 - EPS) {
         im.crop = null;
-        im.ar   = swapped ? 1 / nativeAr : nativeAr;
+        im.ar = swapped ? 1 / nativeAr : nativeAr;
       } else {
         im.crop = { ...cr };
         // Cropped-region aspect ratio in source-image space, then account for rotation
@@ -363,7 +363,7 @@ export function createSketch(p) {
       im.h = im.w / im.ar;
     }
     state.cropTarget = null;
-    state.cropRect   = null;
+    state.cropRect = null;
     const btn = document.getElementById('btn-crop');
     if (btn) btn.classList.remove('active');
     scheduleSave();
@@ -374,18 +374,18 @@ export function createSketch(p) {
     const { x, y, w, h } = state.artboard;
     const inH = wy >= y - t && wy <= y + h + t;
     const inV = wx >= x - t && wx <= x + w + t;
-    return (Math.abs(wx - x)       < t && inH) ||
-           (Math.abs(wx - (x + w)) < t && inH) ||
-           (Math.abs(wy - y)       < t && inV) ||
-           (Math.abs(wy - (y + h)) < t && inV);
+    return (Math.abs(wx - x) < t && inH) ||
+      (Math.abs(wx - (x + w)) < t && inH) ||
+      (Math.abs(wy - y) < t && inV) ||
+      (Math.abs(wy - (y + h)) < t && inV);
   }
 
   function getArtboardCorner(wx, wy) {
     const t = 14 / state.zoomLevel;
     const { x, y, w, h } = state.artboard;
-    if (Math.abs(wx - x)     < t && Math.abs(wy - y)     < t) return 'tl';
-    if (Math.abs(wx - x - w) < t && Math.abs(wy - y)     < t) return 'tr';
-    if (Math.abs(wx - x)     < t && Math.abs(wy - y - h) < t) return 'bl';
+    if (Math.abs(wx - x) < t && Math.abs(wy - y) < t) return 'tl';
+    if (Math.abs(wx - x - w) < t && Math.abs(wy - y) < t) return 'tr';
+    if (Math.abs(wx - x) < t && Math.abs(wy - y - h) < t) return 'bl';
     if (Math.abs(wx - x - w) < t && Math.abs(wy - y - h) < t) return 'br';
     return null;
   }
@@ -397,7 +397,7 @@ export function createSketch(p) {
     const MIN = 100;
     switch (state.dragCorner) {
       case 'tl':
-        state.artboard.x = ab.x + dx;       state.artboard.y = ab.y + dy;
+        state.artboard.x = ab.x + dx; state.artboard.y = ab.y + dy;
         state.artboard.w = Math.max(MIN, ab.w - dx); state.artboard.h = Math.max(MIN, ab.h - dy); break;
       case 'tr':
         state.artboard.y = ab.y + dy;
@@ -425,7 +425,7 @@ export function createSketch(p) {
         const handle = getCropHandle(w.x, w.y, im);
         if (handle) {
           state.dragMode = 'crop-handle';
-          state.dragRef  = { mx: p.mouseX, my: p.mouseY, handle, cr: { ...state.cropRect }, im: { x: im.x, y: im.y, w: im.w, h: im.h } };
+          state.dragRef = { mx: p.mouseX, my: p.mouseY, handle, cr: { ...state.cropRect }, im: { x: im.x, y: im.y, w: im.w, h: im.h } };
           return false;
         }
         // Drag inside crop rect to pan the crop window
@@ -433,20 +433,27 @@ export function createSketch(p) {
         const rx = im.x + cr.x * im.w, ry = im.y + cr.y * im.h;
         if (w.x >= rx && w.x <= rx + cr.w * im.w && w.y >= ry && w.y <= ry + cr.h * im.h) {
           state.dragMode = 'crop-move';
-          state.dragRef  = { mx: p.mouseX, my: p.mouseY, cr: { ...state.cropRect }, im: { x: im.x, y: im.y, w: im.w, h: im.h } };
+          state.dragRef = { mx: p.mouseX, my: p.mouseY, cr: { ...state.cropRect }, im: { x: im.x, y: im.y, w: im.w, h: im.h } };
           return false;
         }
       }
       return false; // eat clicks outside crop area while in crop mode
     }
 
+    // 0.5. Alt + Drag to pan board (intercepts other interactions)
+    if (p.keyIsDown(18)) {
+      state.dragMode = 'pan';
+      state.dragRef = { mx: p.mouseX, my: p.mouseY, px: state.panX, py: state.panY };
+      return false;
+    }
+
     // 1. Free-mode artboard corner resize
     if (state.currentRatio === 'Free') {
       const c = getArtboardCorner(w.x, w.y);
       if (c) {
-        state.dragMode   = 'corner';
+        state.dragMode = 'corner';
         state.dragCorner = c;
-        state.dragRef    = { mx: p.mouseX, my: p.mouseY, ab: { ...state.artboard } };
+        state.dragRef = { mx: p.mouseX, my: p.mouseY, ab: { ...state.artboard } };
         return false;
       }
     }
@@ -470,7 +477,7 @@ export function createSketch(p) {
     // 3. Artboard border drag
     if (isOnArtboardBorder(w.x, w.y)) {
       state.dragMode = 'artboard';
-      state.dragRef  = { mx: p.mouseX, my: p.mouseY, ax: state.artboard.x, ay: state.artboard.y };
+      state.dragRef = { mx: p.mouseX, my: p.mouseY, ax: state.artboard.x, ay: state.artboard.y };
       return false;
     }
 
@@ -483,7 +490,7 @@ export function createSketch(p) {
         // Group drag: clicked image is part of an existing multi-selection
         saveState();
         state.dragMode = 'group';
-        state.dragRef  = {
+        state.dragRef = {
           mx: p.mouseX, my: p.mouseY,
           leadId: hitId,
           offsets: Array.from(state.selectedIds).map(id => {
@@ -496,9 +503,9 @@ export function createSketch(p) {
         saveState();
         state.selectedIds.clear();
         state.selectedIds.add(hitId);
-        state.selIdx   = hit;
+        state.selIdx = hit;
         state.dragMode = 'image';
-        state.dragRef  = { mx: p.mouseX, my: p.mouseY, ix: state.imgs[hit].x, iy: state.imgs[hit].y };
+        state.dragRef = { mx: p.mouseX, my: p.mouseY, ix: state.imgs[hit].x, iy: state.imgs[hit].y };
         updateSelectionUI();
       }
       return false;
@@ -507,20 +514,20 @@ export function createSketch(p) {
     // 5. Empty area — left drag = rubber-band, middle/right drag = pan
     if (p.mouseButton === 'right' || p.mouseButton === 'center') {
       state.selectedIds.clear();
-      state.selIdx   = -1;
+      state.selIdx = -1;
       state.dragMode = 'pan';
-      state.dragRef  = { mx: p.mouseX, my: p.mouseY, px: state.panX, py: state.panY };
+      state.dragRef = { mx: p.mouseX, my: p.mouseY, px: state.panX, py: state.panY };
     } else {
       state.dragMode = 'rubberband';
-      state.rbStart  = { x: w.x, y: w.y };
-      state.rbEnd    = { x: w.x, y: w.y };
-      state.dragRef  = {};
+      state.rbStart = { x: w.x, y: w.y };
+      state.rbEnd = { x: w.x, y: w.y };
+      state.dragRef = {};
     }
     return false;
   };
 
   p.mouseDragged = function () {
-    if (!state.dragMode || !state.dragRef) return false;
+    if (!state.dragMode || !state.dragRef) return;
     state.didDrag = true;
 
     if (state.dragMode === 'crop-handle') {
@@ -571,7 +578,7 @@ export function createSketch(p) {
 
       if (state.snapEnabled) {
         const leadOff = state.dragRef.offsets.find(o => o.id === state.dragRef.leadId);
-        const leadIm  = state.imgs.find(i => i.id === state.dragRef.leadId);
+        const leadIm = state.imgs.find(i => i.id === state.dragRef.leadId);
         if (leadOff && leadIm) {
           const { x: sx, y: sy } = snapPos(
             leadOff.ix + dx, leadOff.iy + dy,
@@ -656,14 +663,14 @@ export function createSketch(p) {
         state.selIdx = -1;
       }
       state.rbStart = null;
-      state.rbEnd   = null;
+      state.rbEnd = null;
       updateSelectionUI();
     }
 
-    state.dragMode   = null;
-    state.dragRef    = null;
+    state.dragMode = null;
+    state.dragRef = null;
     state.dragCorner = null;
-    state.didDrag    = false;
+    state.didDrag = false;
   };
 
   p.mouseWheel = function (event) {
@@ -672,7 +679,7 @@ export function createSketch(p) {
     if (now - lastWheelTime < 50) return false;  // ~20fps cap kills trackpad momentum
     lastWheelTime = now;
     // Normalize line-mode (mouse wheel) to pixel equivalent, then scale + cap at ±10% per event
-    const raw    = event.deltaMode === 1 ? event.deltaY * 40 : event.deltaY;
+    const raw = event.deltaMode === 1 ? event.deltaY * 40 : event.deltaY;
     const factor = Math.max(-0.10, Math.min(0.10, raw * 0.0008));
     // Multiplicative zoom: consistent feel at every zoom level
     const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, state.zoomLevel * (1 - factor)));
@@ -693,7 +700,7 @@ export function createSketch(p) {
 
     // Crop mode: Enter = apply, Escape = cancel, eat everything else
     if (state.cropTarget) {
-      if (p.keyCode === p.ENTER)  { applyCrop(); return false; }
+      if (p.keyCode === p.ENTER) { applyCrop(); return false; }
       if (p.keyCode === p.ESCAPE) {
         state.cropTarget = null; state.cropRect = null;
         const btn = document.getElementById('btn-crop');

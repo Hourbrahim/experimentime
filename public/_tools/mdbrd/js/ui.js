@@ -1,11 +1,11 @@
-import { state }                         from './state.js';
-import { ARTBOARD_PRESETS }              from './config.js';
-import { toast }                         from './toast.js';
-import { doZoom }                        from './viewport.js';
+import { state } from './state.js';
+import { ARTBOARD_PRESETS } from './config.js';
+import { toast } from './toast.js';
+import { doZoom } from './viewport.js';
 import { saveState, restoreState, updateUndoBtn } from './undo.js';
-import { shuffleLayout, layoutImages }   from './layout.js';
-import { loadFiles, removeSelected }      from './files.js';
-import { exportHD }                      from './export.js';
+import { shuffleLayout, layoutImages } from './layout.js';
+import { loadFiles, removeSelected } from './files.js';
+import { exportHD } from './export.js';
 import { scheduleSave, deleteBlobForImage } from './persist.js';
 
 export { toast };
@@ -16,11 +16,11 @@ export function zOrderOp(op) {
   saveState();
   const imgs = state.imgs;
   if (op === 'top') {
-    const sel  = imgs.filter(i =>  state.selectedIds.has(i.id));
+    const sel = imgs.filter(i => state.selectedIds.has(i.id));
     const rest = imgs.filter(i => !state.selectedIds.has(i.id));
     imgs.length = 0; imgs.push(...rest, ...sel);
   } else if (op === 'bottom') {
-    const sel  = imgs.filter(i =>  state.selectedIds.has(i.id));
+    const sel = imgs.filter(i => state.selectedIds.has(i.id));
     const rest = imgs.filter(i => !state.selectedIds.has(i.id));
     imgs.length = 0; imgs.push(...sel, ...rest);
   } else if (op === 'up') {
@@ -72,15 +72,15 @@ export function updateDimDisplay() {
 }
 
 export function showSizePanel() {
-  const panel     = document.getElementById('size-panel');
+  const panel = document.getElementById('size-panel');
   const sidePanel = document.getElementById('panel');
-  const anchor    = document.getElementById('dim-display');
-  const rect      = anchor.getBoundingClientRect();
+  const anchor = document.getElementById('dim-display');
+  const rect = anchor.getBoundingClientRect();
   document.getElementById('sp-w').value = Math.round(state.artboard.w);
   document.getElementById('sp-h').value = Math.round(state.artboard.h);
   panel.classList.add('open');  // add first so offsetWidth is measurable
   const panelLeft = sidePanel ? sidePanel.getBoundingClientRect().left : (window.innerWidth - 200);
-  panel.style.top  = rect.top + 'px';
+  panel.style.top = rect.top + 'px';
   panel.style.left = (panelLeft - panel.offsetWidth - 8) + 'px';
   setTimeout(() => document.getElementById('sp-w').focus(), 0);
 }
@@ -128,10 +128,10 @@ export function initUI(fitScreenFn) {
 
   // Toolbar buttons
   document.getElementById('btn-shuffle').onclick = () => { shuffleLayout(saveState); scheduleSave(); };
-  document.getElementById('btn-fit').onclick     = fitScreenFn;
-  document.getElementById('btn-zin').onclick     = () => doZoom( 0.1, window.innerWidth / 2, window.innerHeight / 2);
-  document.getElementById('btn-zout').onclick    = () => doZoom(-0.1, window.innerWidth / 2, window.innerHeight / 2);
-  document.getElementById('btn-undo').onclick    = restoreState;
+  document.getElementById('btn-fit').onclick = fitScreenFn;
+  document.getElementById('btn-zin').onclick = () => doZoom(0.1, window.innerWidth / 2, window.innerHeight / 2);
+  document.getElementById('btn-zout').onclick = () => doZoom(-0.1, window.innerWidth / 2, window.innerHeight / 2);
+  document.getElementById('btn-undo').onclick = restoreState;
   document.getElementById('btn-select-all').onclick = selectAll;
 
   const snapBtn = document.getElementById('btn-snap');
@@ -169,34 +169,41 @@ export function initUI(fitScreenFn) {
   };
 
   // Layout mode toggle
-  const btnLayoutStructured    = document.getElementById('btn-layout-structured');
-  const btnLayoutRows          = document.getElementById('btn-layout-rows');
-  const btnLayoutBricks        = document.getElementById('btn-layout-bricks');
-  const btnLayoutCloud         = document.getElementById('btn-layout-cloud');
-  const btnLayoutCloudBricks   = document.getElementById('btn-layout-cloudbricks');
-  const btnLayoutScatter       = document.getElementById('btn-layout-scatter');
-  const btnLayoutOrient        = document.getElementById('btn-layout-orient');
-  const colrowWrap             = document.getElementById('colrow-wrap');
-  const colrowLabel            = document.getElementById('colrow-label');
-  const colrowInput            = document.getElementById('colrow-input');
-  const gapInput               = document.getElementById('gap-input');
-  const btnOrient              = document.getElementById('btn-orient');
-  const btnThemeLight          = document.getElementById('btn-theme-light');
-  const btnThemeDark           = document.getElementById('btn-theme-dark');
+  const btnLayoutStructured = document.getElementById('btn-layout-structured');
+  const btnLayoutRows = document.getElementById('btn-layout-rows');
+  const btnLayoutBricks = document.getElementById('btn-layout-bricks');
+  const btnLayoutCloud = document.getElementById('btn-layout-cloud');
+  const btnLayoutCloudBricks = document.getElementById('btn-layout-cloudbricks');
+  const btnLayoutScatter = document.getElementById('btn-layout-scatter');
+  const btnLayoutCircle = document.getElementById('btn-layout-circle');
+  const btnLayoutSpiral = document.getElementById('btn-layout-spiral');
+  const btnLayoutOrient = document.getElementById('btn-layout-orient');
+  const colrowWrap = document.getElementById('colrow-wrap');
+  const colrowLabel = document.getElementById('colrow-label');
+  const colrowInput = document.getElementById('colrow-input');
+  const gapInput = document.getElementById('gap-input');
+  const btnOrient = document.getElementById('btn-orient');
+  const btnThemeLight = document.getElementById('btn-theme-light');
+  const btnThemeDark = document.getElementById('btn-theme-dark');
 
   const SVG_LANDSCAPE = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="4.5" width="16" height="9" rx="1.5"/></svg>`;
-  const SVG_PORTRAIT  = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="4.5" y="1" width="9" height="16" rx="1.5"/></svg>`;
+  const SVG_PORTRAIT = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="4.5" y="1" width="9" height="16" rx="1.5"/></svg>`;
 
   function syncLayoutButtons() {
     if (!btnLayoutStructured || !btnLayoutRows) return;
     btnLayoutStructured.classList.toggle('active', state.layoutMode === 'masonry');
     btnLayoutRows.classList.toggle('active', state.layoutMode === 'rows');
-    if (btnLayoutBricks)      btnLayoutBricks.classList.toggle('active', state.layoutMode === 'bricks');
-    if (btnLayoutCloud)       btnLayoutCloud.classList.toggle('active', state.layoutMode === 'cloud');
+    if (btnLayoutBricks) btnLayoutBricks.classList.toggle('active', state.layoutMode === 'bricks');
+    if (btnLayoutCloud) btnLayoutCloud.classList.toggle('active', state.layoutMode === 'cloud');
     if (btnLayoutCloudBricks) btnLayoutCloudBricks.classList.toggle('active', state.layoutMode === 'cloudbricks');
-    if (btnLayoutScatter)     btnLayoutScatter.classList.toggle('active', state.layoutMode === 'scatter');
+    if (btnLayoutScatter) btnLayoutScatter.classList.toggle('active', state.layoutMode === 'scatter');
+    if (btnLayoutCircle) btnLayoutCircle.classList.toggle('active', state.layoutMode === 'circle');
+    if (btnLayoutSpiral) btnLayoutSpiral.classList.toggle('active', state.layoutMode === 'spiral');
     syncColRowControl();
   }
+
+  const colrowSlider = document.getElementById('colrow-slider');
+  const gapSlider = document.getElementById('gap-slider');
 
   function syncColRowControl() {
     if (!colrowWrap) return;
@@ -205,14 +212,56 @@ export function initUI(fitScreenFn) {
       return;
     }
     colrowWrap.style.display = '';
-    if (state.layoutMode === 'masonry') {
-      colrowLabel.textContent = 'Cols';
-      colrowInput.value = state.numCols > 0 ? state.numCols : '';
+
+    const gapLbl = document.getElementById('gap-label');
+
+    if (state.layoutMode === 'circle' || state.layoutMode === 'spiral') {
+      colrowLabel.textContent = state.layoutMode === 'circle' ? 'Diam' : 'Radius';
+      colrowInput.max = "8000";
+      colrowInput.value = state.shapeRadius;
+      if (colrowSlider) {
+        colrowSlider.max = "8000";
+        colrowSlider.value = state.shapeRadius;
+      }
+      if (gapLbl) gapLbl.textContent = 'Scale';
+      if (gapInput) {
+        gapInput.max = "1000";
+        gapInput.value = state.shapeScale;
+        gapInput.title = 'Image scale %';
+      }
+      if (gapSlider) {
+        gapSlider.max = "1000";
+        gapSlider.value = state.shapeScale;
+      }
     } else {
-      colrowLabel.textContent = 'Rows';
-      colrowInput.value = state.numRows > 0 ? state.numRows : '';
+      if (state.layoutMode === 'masonry') {
+        colrowLabel.textContent = 'Cols';
+        colrowInput.max = "20";
+        colrowInput.value = state.numCols > 0 ? state.numCols : '';
+        if (colrowSlider) {
+          colrowSlider.max = "20";
+          colrowSlider.value = state.numCols > 0 ? state.numCols : 0;
+        }
+      } else {
+        colrowLabel.textContent = 'Rows';
+        colrowInput.max = "20";
+        colrowInput.value = state.numRows > 0 ? state.numRows : '';
+        if (colrowSlider) {
+          colrowSlider.max = "20";
+          colrowSlider.value = state.numRows > 0 ? state.numRows : 0;
+        }
+      }
+      if (gapLbl) gapLbl.textContent = 'Gap';
+      if (gapInput) {
+        gapInput.max = "500";
+        gapInput.value = state.layoutGap > 0 ? state.layoutGap : '';
+        gapInput.title = 'Gap between pictures (px)';
+      }
+      if (gapSlider) {
+        gapSlider.max = "500";
+        gapSlider.value = state.layoutGap > 0 ? state.layoutGap : 0;
+      }
     }
-    if (gapInput) gapInput.value = state.layoutGap > 0 ? state.layoutGap : '';
   }
 
   function syncOrientationButtons() {
@@ -257,30 +306,56 @@ export function initUI(fitScreenFn) {
     }
   }
 
-  if (colrowInput) {
-    colrowInput.addEventListener('change', () => {
-      const v = parseInt(colrowInput.value, 10);
+  function handleColRowChange(source) {
+    const v = parseInt(source.value, 10);
+    if (state.layoutMode === 'circle' || state.layoutMode === 'spiral') {
+      const val = (isNaN(v) || v < 10) ? 100 : Math.min(v, 8000);
+      if (source !== colrowInput) colrowInput.value = val;
+      if (source !== colrowSlider && colrowSlider) colrowSlider.value = val;
+      state.shapeRadius = val;
+    } else {
       const val = (isNaN(v) || v < 1) ? 0 : Math.min(v, 20);
-      colrowInput.value = val > 0 ? val : '';
+      if (source !== colrowInput) colrowInput.value = val > 0 ? val : '';
+      if (source !== colrowSlider && colrowSlider) colrowSlider.value = val;
       if (state.layoutMode === 'masonry') {
         state.numCols = val;
       } else {
         state.numRows = val;
       }
-      layoutImages();
-      scheduleSave();
-    });
+    }
+    layoutImages();
+    scheduleSave();
+  }
+
+  if (colrowInput) {
+    colrowInput.addEventListener('change', () => handleColRowChange(colrowInput));
+  }
+  if (colrowSlider) {
+    colrowSlider.addEventListener('input', () => handleColRowChange(colrowSlider));
+  }
+
+  function handleGapChange(source) {
+    const v = parseInt(source.value, 10);
+    if (state.layoutMode === 'circle' || state.layoutMode === 'spiral') {
+      const val = (isNaN(v) || v < 1) ? 10 : Math.min(v, 1000);
+      if (source !== gapInput) gapInput.value = val;
+      if (source !== gapSlider && gapSlider) gapSlider.value = val;
+      state.shapeScale = val;
+    } else {
+      const val = (isNaN(v) || v < 0) ? 0 : Math.min(v, 500);
+      if (source !== gapInput) gapInput.value = val > 0 ? val : '';
+      if (source !== gapSlider && gapSlider) gapSlider.value = val;
+      state.layoutGap = val;
+    }
+    layoutImages();
+    scheduleSave();
   }
 
   if (gapInput) {
-    gapInput.addEventListener('change', () => {
-      const v = parseInt(gapInput.value, 10);
-      const val = (isNaN(v) || v < 0) ? 0 : Math.min(v, 500);
-      gapInput.value = val > 0 ? val : '';
-      state.layoutGap = val;
-      layoutImages();
-      scheduleSave();
-    });
+    gapInput.addEventListener('change', () => handleGapChange(gapInput));
+  }
+  if (gapSlider) {
+    gapSlider.addEventListener('input', () => handleGapChange(gapSlider));
   }
 
   if (btnLayoutStructured && btnLayoutRows) {
@@ -290,12 +365,14 @@ export function initUI(fitScreenFn) {
       layoutImages();
       scheduleSave();
     };
-    btnLayoutStructured.onclick  = () => setLayout('masonry');
-    btnLayoutRows.onclick        = () => setLayout('rows');
-    if (btnLayoutBricks)       btnLayoutBricks.onclick       = () => setLayout('bricks');
-    if (btnLayoutCloud)        btnLayoutCloud.onclick        = () => setLayout('cloud');
-    if (btnLayoutCloudBricks)  btnLayoutCloudBricks.onclick  = () => setLayout('cloudbricks');
-    if (btnLayoutScatter)      btnLayoutScatter.onclick      = () => setLayout('scatter');
+    btnLayoutStructured.onclick = () => setLayout('masonry');
+    btnLayoutRows.onclick = () => setLayout('rows');
+    if (btnLayoutBricks) btnLayoutBricks.onclick = () => setLayout('bricks');
+    if (btnLayoutCloud) btnLayoutCloud.onclick = () => setLayout('cloud');
+    if (btnLayoutCloudBricks) btnLayoutCloudBricks.onclick = () => setLayout('cloudbricks');
+    if (btnLayoutScatter) btnLayoutScatter.onclick = () => setLayout('scatter');
+    if (btnLayoutCircle) btnLayoutCircle.onclick = () => setLayout('circle');
+    if (btnLayoutSpiral) btnLayoutSpiral.onclick = () => setLayout('spiral');
     syncLayoutButtons();
   }
 
@@ -329,7 +406,7 @@ export function initUI(fitScreenFn) {
 
   if (btnThemeLight && btnThemeDark) {
     btnThemeLight.onclick = () => applyTheme('light');
-    btnThemeDark.onclick  = () => applyTheme('dark');
+    btnThemeDark.onclick = () => applyTheme('dark');
   }
 
   document.getElementById('ratio-sel').addEventListener('change', function () {
@@ -382,9 +459,9 @@ export function initUI(fitScreenFn) {
 
   // ── Image actions (Rotate, Flip, Crop) ──
   const btnRotate = document.getElementById('btn-rotate');
-  const btnFlipH  = document.getElementById('btn-flip-h');
-  const btnFlipV  = document.getElementById('btn-flip-v');
-  const btnCrop   = document.getElementById('btn-crop');
+  const btnFlipH = document.getElementById('btn-flip-h');
+  const btnFlipV = document.getElementById('btn-flip-v');
+  const btnCrop = document.getElementById('btn-crop');
 
   if (btnRotate) {
     btnRotate.onclick = () => {
@@ -438,7 +515,7 @@ export function initUI(fitScreenFn) {
             ? null : { ...cr };
         }
         state.cropTarget = null;
-        state.cropRect   = null;
+        state.cropRect = null;
         btnCrop.classList.remove('active');
         scheduleSave();
       } else if (state.selectedIds.size === 1) {
@@ -447,7 +524,7 @@ export function initUI(fitScreenFn) {
         const im = state.imgs.find(i => i.id === id);
         if (!im) return;
         state.cropTarget = id;
-        state.cropRect   = im.crop ? { ...im.crop } : { x: 0, y: 0, w: 1, h: 1 };
+        state.cropRect = im.crop ? { ...im.crop } : { x: 0, y: 0, w: 1, h: 1 };
         btnCrop.classList.add('active');
       }
     };
@@ -466,17 +543,17 @@ export function initUI(fitScreenFn) {
   }
 
   // ── Z-order controls ──
-  const btnZTop    = document.getElementById('btn-z-top');
-  const btnZUp     = document.getElementById('btn-z-up');
-  const btnZDown   = document.getElementById('btn-z-down');
+  const btnZTop = document.getElementById('btn-z-top');
+  const btnZUp = document.getElementById('btn-z-up');
+  const btnZDown = document.getElementById('btn-z-down');
   const btnZBottom = document.getElementById('btn-z-bottom');
-  if (btnZTop)    btnZTop.onclick    = () => zOrderOp('top');
-  if (btnZUp)     btnZUp.onclick     = () => zOrderOp('up');
-  if (btnZDown)   btnZDown.onclick   = () => zOrderOp('down');
+  if (btnZTop) btnZTop.onclick = () => zOrderOp('top');
+  if (btnZUp) btnZUp.onclick = () => zOrderOp('up');
+  if (btnZDown) btnZDown.onclick = () => zOrderOp('down');
   if (btnZBottom) btnZBottom.onclick = () => zOrderOp('bottom');
 
   // ── Panel resize ──
-  const panelEl2     = document.getElementById('panel');
+  const panelEl2 = document.getElementById('panel');
   const resizeHandle = document.getElementById('panel-resize');
   const PN_KEY = 'moodflow-panel-w', PN_MIN = 170, PN_MAX = 280, PN_DEF = 200;
 
@@ -494,10 +571,10 @@ export function initUI(fitScreenFn) {
     let rDragging = false, rStartX = 0, rStartW = 0;
     resizeHandle.addEventListener('mousedown', e => {
       rDragging = true;
-      rStartX   = e.clientX;
-      rStartW   = panelEl2.offsetWidth;
+      rStartX = e.clientX;
+      rStartW = panelEl2.offsetWidth;
       resizeHandle.classList.add('dragging');
-      document.body.style.cursor     = 'ew-resize';
+      document.body.style.cursor = 'ew-resize';
       document.body.style.userSelect = 'none';
       e.preventDefault();
     });
@@ -511,9 +588,9 @@ export function initUI(fitScreenFn) {
       if (!rDragging) return;
       rDragging = false;
       resizeHandle.classList.remove('dragging');
-      document.body.style.cursor     = '';
+      document.body.style.cursor = '';
       document.body.style.userSelect = '';
-      try { localStorage.setItem(PN_KEY, panelEl2.offsetWidth); } catch {}
+      try { localStorage.setItem(PN_KEY, panelEl2.offsetWidth); } catch { }
     });
   }
 
@@ -524,13 +601,13 @@ export function initUI(fitScreenFn) {
 
 function initWelcome() {
   const WK = 'mdbrd-welcome-seen';
-  const el  = document.getElementById('welcome');
+  const el = document.getElementById('welcome');
   if (!el) return;
 
   function show() { el.classList.add('show'); }
   function dismiss() {
     el.classList.remove('show');
-    try { localStorage.setItem(WK, '1'); } catch {}
+    try { localStorage.setItem(WK, '1'); } catch { }
   }
 
   try { if (!localStorage.getItem(WK)) setTimeout(show, 350); } catch { setTimeout(show, 350); }
@@ -547,38 +624,84 @@ export function syncPageUI() {
   if (ratioSel) ratioSel.value = state.currentRatio;
   if (bgColor) bgColor.value = state.bgColor;
 
-  const btnLayoutStructured    = document.getElementById('btn-layout-structured');
-  const btnLayoutRowsSync      = document.getElementById('btn-layout-rows');
-  const btnLayoutBricksSync    = document.getElementById('btn-layout-bricks');
-  const btnLayoutCloudSync     = document.getElementById('btn-layout-cloud');
+  const btnLayoutStructured = document.getElementById('btn-layout-structured');
+  const btnLayoutRowsSync = document.getElementById('btn-layout-rows');
+  const btnLayoutBricksSync = document.getElementById('btn-layout-bricks');
+  const btnLayoutCloudSync = document.getElementById('btn-layout-cloud');
   const btnLayoutCloudBricksSync = document.getElementById('btn-layout-cloudbricks');
-  const btnLayoutScatterSync   = document.getElementById('btn-layout-scatter');
+  const btnLayoutScatterSync = document.getElementById('btn-layout-scatter');
+  const btnLayoutCircleSync = document.getElementById('btn-layout-circle');
+  const btnLayoutSpiralSync = document.getElementById('btn-layout-spiral');
   if (btnLayoutStructured && btnLayoutRowsSync) {
     btnLayoutStructured.classList.toggle('active', state.layoutMode === 'masonry');
     btnLayoutRowsSync.classList.toggle('active', state.layoutMode === 'rows');
-    if (btnLayoutBricksSync)      btnLayoutBricksSync.classList.toggle('active', state.layoutMode === 'bricks');
-    if (btnLayoutCloudSync)       btnLayoutCloudSync.classList.toggle('active', state.layoutMode === 'cloud');
+    if (btnLayoutBricksSync) btnLayoutBricksSync.classList.toggle('active', state.layoutMode === 'bricks');
+    if (btnLayoutCloudSync) btnLayoutCloudSync.classList.toggle('active', state.layoutMode === 'cloud');
     if (btnLayoutCloudBricksSync) btnLayoutCloudBricksSync.classList.toggle('active', state.layoutMode === 'cloudbricks');
-    if (btnLayoutScatterSync)     btnLayoutScatterSync.classList.toggle('active', state.layoutMode === 'scatter');
+    if (btnLayoutScatterSync) btnLayoutScatterSync.classList.toggle('active', state.layoutMode === 'scatter');
+    if (btnLayoutCircleSync) btnLayoutCircleSync.classList.toggle('active', state.layoutMode === 'circle');
+    if (btnLayoutSpiralSync) btnLayoutSpiralSync.classList.toggle('active', state.layoutMode === 'spiral');
   }
 
-  const _colrowWrap  = document.getElementById('colrow-wrap');
+  const _colrowWrap = document.getElementById('colrow-wrap');
   const _colrowLabel = document.getElementById('colrow-label');
   const _colrowInput = document.getElementById('colrow-input');
-  const _gapInput    = document.getElementById('gap-input');
+  const _colrowSlider = document.getElementById('colrow-slider');
+  const _gapInput = document.getElementById('gap-input');
+  const _gapSlider = document.getElementById('gap-slider');
+  const _gapLbl = document.getElementById('gap-label');
   if (_colrowWrap) {
     if (state.layoutMode === 'scatter') {
       _colrowWrap.style.display = 'none';
     } else {
       _colrowWrap.style.display = '';
-      if (state.layoutMode === 'masonry') {
-        _colrowLabel.textContent = 'Cols';
-        _colrowInput.value = state.numCols > 0 ? state.numCols : '';
+      if (state.layoutMode === 'circle' || state.layoutMode === 'spiral') {
+        _colrowLabel.textContent = state.layoutMode === 'circle' ? 'Diam' : 'Radius';
+        _colrowInput.max = "8000";
+        _colrowInput.value = state.shapeRadius;
+        if (_colrowSlider) {
+          _colrowSlider.max = "8000";
+          _colrowSlider.value = state.shapeRadius;
+        }
+        if (_gapLbl) _gapLbl.textContent = 'Scale';
+        if (_gapInput) {
+          _gapInput.max = "1000";
+          _gapInput.value = state.shapeScale;
+          _gapInput.title = 'Image scale %';
+        }
+        if (_gapSlider) {
+          _gapSlider.max = "1000";
+          _gapSlider.value = state.shapeScale;
+        }
       } else {
-        _colrowLabel.textContent = 'Rows';
-        _colrowInput.value = state.numRows > 0 ? state.numRows : '';
+        if (state.layoutMode === 'masonry') {
+          _colrowLabel.textContent = 'Cols';
+          _colrowInput.max = "20";
+          _colrowInput.value = state.numCols > 0 ? state.numCols : '';
+          if (_colrowSlider) {
+            _colrowSlider.max = "20";
+            _colrowSlider.value = state.numCols > 0 ? state.numCols : 0;
+          }
+        } else {
+          _colrowLabel.textContent = 'Rows';
+          _colrowInput.max = "20";
+          _colrowInput.value = state.numRows > 0 ? state.numRows : '';
+          if (_colrowSlider) {
+            _colrowSlider.max = "20";
+            _colrowSlider.value = state.numRows > 0 ? state.numRows : 0;
+          }
+        }
+        if (_gapLbl) _gapLbl.textContent = 'Gap';
+        if (_gapInput) {
+          _gapInput.max = "500";
+          _gapInput.value = state.layoutGap > 0 ? state.layoutGap : '';
+          _gapInput.title = 'Gap between pictures (px)';
+        }
+        if (_gapSlider) {
+          _gapSlider.max = "500";
+          _gapSlider.value = state.layoutGap > 0 ? state.layoutGap : 0;
+        }
       }
-      if (_gapInput) _gapInput.value = state.layoutGap > 0 ? state.layoutGap : '';
     }
   }
 
@@ -586,16 +709,16 @@ export function syncPageUI() {
   const _svgP = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="4.5" y="1" width="9" height="16" rx="1.5"/></svg>`;
   const _canvasIsL = state.artboard.w >= state.artboard.h;
   const _layoutIsL = state.orientation === 'landscape';
-  const _bo  = document.getElementById('btn-orient');
-  if (_bo)  _bo.innerHTML  = _canvasIsL ? _svgL : _svgP;
+  const _bo = document.getElementById('btn-orient');
+  if (_bo) _bo.innerHTML = _canvasIsL ? _svgL : _svgP;
   const _blo = document.getElementById('btn-layout-orient');
   if (_blo) _blo.innerHTML = _layoutIsL ? _svgL : _svgP;
 
   const snapBtn = document.getElementById('btn-snap');
   if (snapBtn) {
     snapBtn.textContent = state.snapEnabled ? 'Snap ON' : 'Snap OFF';
-    snapBtn.classList.toggle('active',   state.snapEnabled);
-    snapBtn.classList.toggle('snap-on',  state.snapEnabled);
+    snapBtn.classList.toggle('active', state.snapEnabled);
+    snapBtn.classList.toggle('snap-on', state.snapEnabled);
     snapBtn.classList.toggle('snap-off', !state.snapEnabled);
   }
 

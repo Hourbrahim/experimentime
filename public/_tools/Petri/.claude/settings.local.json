@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm ls -g http-server)",
+      "Bash(npx --yes http-server --version)",
+      "mcp__Claude_Preview__preview_start",
+      "WebSearch",
+      "WebFetch(domain:devtails.xyz)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:mediabunny.dev)",
+      "WebFetch(domain:chromestatus.com)",
+      "WebFetch(domain:www.jsdelivr.com)"
+    ]
+  }
+}

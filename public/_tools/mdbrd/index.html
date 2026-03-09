@@ -65,14 +65,22 @@
         <button class="tb-btn pn-flex" id="btn-layout-cloudbricks">Cloud+</button>
         <button class="tb-btn pn-flex" id="btn-layout-scatter">Scatter</button>
       </div>
-      <label class="pn-colrow" id="colrow-wrap">
-        <span class="pn-colrow-lbl" id="colrow-label">Cols</span>
-        <input type="number" id="colrow-input" class="pn-num" min="0" max="20" placeholder="auto"
-          title="0 = auto">
-        <span class="pn-colrow-lbl">Gap</span>
-        <input type="number" id="gap-input" class="pn-num" min="0" max="500" placeholder="0"
-          title="Gap between pictures (px)">
-      </label>
+      <div class="pn-row">
+        <button class="tb-btn pn-flex" id="btn-layout-circle">Circle</button>
+        <button class="tb-btn pn-flex" id="btn-layout-spiral">Spiral</button>
+      </div>
+      <div id="colrow-wrap">
+        <div class="pn-slider-row">
+          <span class="pn-colrow-lbl" id="colrow-label">Cols</span>
+          <input type="range" id="colrow-slider" class="pn-slider" min="0" max="20" value="0">
+          <input type="number" id="colrow-input" class="pn-num slider-num" min="0" max="20" placeholder="auto" title="0 = auto">
+        </div>
+        <div class="pn-slider-row">
+          <span class="pn-colrow-lbl" id="gap-label">Gap</span>
+          <input type="range" id="gap-slider" class="pn-slider" min="0" max="500" value="0">
+          <input type="number" id="gap-input" class="pn-num slider-num" min="0" max="500" placeholder="0" title="Gap between pictures (px)">
+        </div>
+      </div>
     </div>
 
     <div class="pn-div"></div>
@@ -289,6 +297,7 @@
           <div class="wc-row"><kbd>Ctrl A</kbd><span>Select all</span></div>
           <div class="wc-row"><kbd>Ctrl Z</kbd><span>Undo</span></div>
           <div class="wc-row"><kbd>Del</kbd><span>Delete selected</span></div>
+          <div class="wc-row"><kbd>Alt Drag</kbd><span>Pan board</span></div>
         </div>
         <div class="wc-col">
           <div class="wc-group">Image</div>

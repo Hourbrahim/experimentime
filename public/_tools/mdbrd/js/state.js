@@ -9,6 +9,8 @@ const page0 = {
   numCols: 0,
   numRows: 0,
   layoutGap: 0,
+  shapeRadius: 400,
+  shapeScale: 100,
   undoStack: [],
 };
 
@@ -27,6 +29,8 @@ export const state = {
   numCols:     page0.numCols,
   numRows:     page0.numRows,
   layoutGap:   page0.layoutGap,
+  shapeRadius: page0.shapeRadius,
+  shapeScale:  page0.shapeScale,
   undoStack:   page0.undoStack,
 
   // Global fields (not per-page)

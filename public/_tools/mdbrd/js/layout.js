@@ -16,11 +16,11 @@ function layoutMasonry(ready) {
     numCols = Math.max(1, Math.min(state.numCols, n));
   } else {
     let baseCols = n <= 2 ? n
-      : n <= 4  ? 2
-      : n <= 9  ? 3
-      : n <= 16 ? 4
-      : n <= 25 ? 5
-      : 6;
+      : n <= 4 ? 2
+        : n <= 9 ? 3
+          : n <= 16 ? 4
+            : n <= 25 ? 5
+              : 6;
     if (state.orientation === 'landscape' && baseCols < 6) baseCols += 1;
     else if (state.orientation === 'portrait' && baseCols > 1) baseCols -= 1;
     numCols = baseCols;
@@ -39,8 +39,8 @@ function layoutMasonry(ready) {
   const maxColH = Math.max(...simH);
 
   // Scale to fit artboard height; gaps scale proportionally
-  const scale  = maxColH > artboard.h ? artboard.h / maxColH : 1;
-  const colW   = nomColW * scale;
+  const scale = maxColH > artboard.h ? artboard.h / maxColH : 1;
+  const colW = nomColW * scale;
   const scaledG = g * scale;
   const startX = artboard.x + (artboard.w - numCols * colW - (numCols - 1) * scaledG) / 2;
 
@@ -97,14 +97,14 @@ function layoutRows(ready) {
   // Justified height per row; clamp total to artboard height and center
   const g = state.layoutGap || 0;
   const rowHeights = rows.map(r => Math.max(1, artboard.w - (r.items.length - 1) * g) / r.aspectSum);
-  const totalH  = rowHeights.reduce((s, h) => s + h, 0) + (rows.length - 1) * g;
-  const hScale  = totalH > artboard.h ? artboard.h / totalH : 1;
+  const totalH = rowHeights.reduce((s, h) => s + h, 0) + (rows.length - 1) * g;
+  const hScale = totalH > artboard.h ? artboard.h / totalH : 1;
   const scaledG = g * hScale;
   let floatY = artboard.y + (artboard.h - totalH * hScale) / 2;
 
   for (let ri = 0; ri < rows.length; ri++) {
-    const r   = rows[ri];
-    const rH  = rowHeights[ri] * hScale;   // scaled row height
+    const r = rows[ri];
+    const rH = rowHeights[ri] * hScale;   // scaled row height
     const rowW = rH * r.aspectSum;          // images width (without gaps)
     const intY = Math.round(floatY);
     const intH = Math.round(floatY + rH) - intY;
@@ -184,8 +184,8 @@ function layoutBricks(ready) {
     if (isPortrait) numRows = Math.max(1, Math.round(numRows * 1.3));
   }
 
-  const totalAr  = slots.reduce((s, sl) => s + sl.combinedAr, 0);
-  const rowH     = Math.min(artboard.w * numRows / totalAr, artboard.h / numRows);
+  const totalAr = slots.reduce((s, sl) => s + sl.combinedAr, 0);
+  const rowH = Math.min(artboard.w * numRows / totalAr, artboard.h / numRows);
   const targetAr = artboard.w / rowH;
 
   const rows = [];
@@ -203,18 +203,18 @@ function layoutBricks(ready) {
 
   const g = state.layoutGap || 0;
   const rowHeights = rows.map(r => Math.max(1, artboard.w - (r.slots.length - 1) * g) / r.aspectSum);
-  const totalH  = rowHeights.reduce((s, h) => s + h, 0) + (rows.length - 1) * g;
-  const hScale  = totalH > artboard.h ? artboard.h / totalH : 1;
+  const totalH = rowHeights.reduce((s, h) => s + h, 0) + (rows.length - 1) * g;
+  const hScale = totalH > artboard.h ? artboard.h / totalH : 1;
   const scaledG = g * hScale;
   let floatY = artboard.y + (artboard.h - totalH * hScale) / 2;
 
   for (let ri = 0; ri < rows.length; ri++) {
-    const slotH  = rowHeights[ri] * hScale;        // scaled row height
-    const rowW   = slotH * rows[ri].aspectSum;      // slots width (without gaps)
+    const slotH = rowHeights[ri] * hScale;        // scaled row height
+    const rowW = slotH * rows[ri].aspectSum;      // slots width (without gaps)
     const totalRowW = rowW + (rows[ri].slots.length - 1) * scaledG;
-    let floatX   = artboard.x + (artboard.w - totalRowW) / 2;  // center row
+    let floatX = artboard.x + (artboard.w - totalRowW) / 2;  // center row
     for (const sl of rows[ri].slots) {
-      const slotW    = slotH * sl.combinedAr;
+      const slotW = slotH * sl.combinedAr;
       const slotIntX = Math.round(floatX);
       const slotIntW = Math.round(floatX + slotW) - slotIntX;
       placeSlotImages(sl, slotIntX, slotIntW, slotW, floatY);
@@ -278,10 +278,10 @@ function layoutCloud(ready) {
   let H_prime, jitter;
   if (_structureCache.key === key && _structureCache.hPrime?.length === numRows) {
     H_prime = _structureCache.hPrime;
-    jitter  = _structureCache.jitter;
+    jitter = _structureCache.jitter;
   } else {
     H_prime = [];
-    jitter  = [];
+    jitter = [];
     for (let i = 0; i < numRows; i++) {
       H_prime.push(0.85 + 0.4 * Math.random());
       jitter.push(Math.random() * 0.06 - 0.03);
@@ -313,9 +313,9 @@ function layoutCloud(ready) {
   let floatY = cy - totalClusterH / 2;
 
   for (let i = 0; i < numRows; i++) {
-    const row       = rows[i];
-    const absH      = H_prime[i] * scale;
-    const absW      = absH * row.aspectSum;
+    const row = rows[i];
+    const absH = H_prime[i] * scale;
+    const absW = absH * row.aspectSum;
     const rowTotalW = absW + (row.items.length - 1) * g;
     const nextFloatY = floatY + absH;
     const intY = Math.round(floatY);
@@ -394,10 +394,10 @@ function layoutCloudBricks(ready) {
   let H_prime, jitter;
   if (cachedSlots && _structureCache.hPrime?.length === numRows) {
     H_prime = _structureCache.hPrime;
-    jitter  = _structureCache.jitter;
+    jitter = _structureCache.jitter;
   } else {
     H_prime = [];
-    jitter  = [];
+    jitter = [];
     for (let i = 0; i < numRows; i++) {
       H_prime.push(0.85 + 0.4 * Math.random());
       jitter.push(Math.random() * 0.06 - 0.03);
@@ -429,15 +429,15 @@ function layoutCloudBricks(ready) {
   let floatY = cy - totalClusterH / 2;
 
   for (let i = 0; i < numRows; i++) {
-    const row       = rows[i];
-    const absH      = H_prime[i] * scale;
-    const absW      = absH * row.aspectSum;
+    const row = rows[i];
+    const absH = H_prime[i] * scale;
+    const absW = absH * row.aspectSum;
     const rowTotalW = absW + (row.slots.length - 1) * g;
     const nextFloatY = floatY + absH;
     let floatX = cx - rowTotalW / 2 + rowTotalW * jitter[i];
 
     for (const sl of row.slots) {
-      const slotW    = absH * sl.combinedAr;
+      const slotW = absH * sl.combinedAr;
       const slotIntX = Math.round(floatX);
       const slotIntW = Math.round(floatX + slotW) - slotIntX;
       placeSlotImages(sl, slotIntX, slotIntW, slotW, floatY);
@@ -471,8 +471,8 @@ function layoutScatter(ready) {
   }
 
   for (let i = 0; i < n; i++) {
-    const im   = ready[i];
-    const ar   = im.ar || 1;
+    const im = ready[i];
+    const ar = im.ar || 1;
     const cell = cells[i % cells.length];
 
     // Area-normalized size with ±40% variation → images have similar visual weight
@@ -492,15 +492,129 @@ function layoutScatter(ready) {
   }
 }
 
+function layoutCircle(ready) {
+  const n = ready.length;
+  if (!n) return;
+  const { artboard } = state;
+  const cx = artboard.x + artboard.w / 2;
+  const cy = artboard.y + artboard.h / 2;
+  const radius = state.shapeRadius / 2;
+  const scale = (state.shapeScale || 100) / 100;
+
+  for (let i = 0; i < n; i++) {
+    const im = ready[i];
+    const angle = (i / n) * Math.PI * 2 - Math.PI / 2; // start from top
+    const ar = im.ar || 1;
+
+    // Base width 200px scaled by user setting
+    const baseW = 200 * scale;
+    im.w = Math.round(baseW);
+    im.h = Math.round(im.w / ar);
+
+    im.x = Math.round(cx + Math.cos(angle) * radius - im.w / 2);
+    im.y = Math.round(cy + Math.sin(angle) * radius - im.h / 2);
+  }
+}
+
+function layoutSpiral(ready) {
+  const n = ready.length;
+  if (!n) return;
+  const { artboard } = state;
+  const cx = artboard.x + artboard.w / 2;
+  const cy = artboard.y + artboard.h / 2;
+
+  // Target "Radius" will now control the expansion/tightness of the spiral path
+  // instead of being a hard boundary that forces a scale-up.
+  const tightness = (state.shapeRadius || 400) / 400;
+
+  // Base scale from user setting
+  const userScale = (state.shapeScale || 100) / 100;
+
+  // Let's create an Archimedean spiral r = a * theta
+  // Use tightness to control how much the spiral spreads out.
+  const typicalW = 200 * userScale;
+  const a = (typicalW * tightness) / (2 * Math.PI);
+
+  let currentTheta = 0;
+
+  for (let i = 0; i < n; i++) {
+    const im = ready[i];
+    const ar = im.ar || 1;
+
+    // progressive scaling
+    const progress = n > 1 ? i / (n - 1) : 1;
+    const sizeMultiplier = 0.2 + 0.8 * progress;
+
+    im.w = Math.round(typicalW * sizeMultiplier);
+    im.h = Math.round(im.w / ar);
+
+    if (i > 0) {
+      const prev = ready[i - 1];
+      const reqDist = (Math.max(im.w, im.h) + Math.max(prev.w, prev.h)) * 0.55;
+
+      let step = 0.1;
+      let dist = 0;
+      let testTheta = currentTheta;
+      const startX = Math.cos(currentTheta) * (a * currentTheta);
+      const startY = Math.sin(currentTheta) * (a * currentTheta);
+
+      while (dist < reqDist) {
+        testTheta += step;
+        const testX = Math.cos(testTheta) * (a * testTheta);
+        const testY = Math.sin(testTheta) * (a * testTheta);
+        dist = Math.hypot(testX - startX, testY - startY);
+      }
+      currentTheta = testTheta;
+    }
+
+    const r = a * currentTheta;
+    im.x = cx + Math.cos(currentTheta) * r - im.w / 2;
+    im.y = cy + Math.sin(currentTheta) * r - im.h / 2;
+  }
+
+  // --- SMART AUTOFIT ---
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const im of ready) {
+    minX = Math.min(minX, im.x);
+    minY = Math.min(minY, im.y);
+    maxX = Math.max(maxX, im.x + im.w);
+    maxY = Math.max(maxY, im.y + im.h);
+  }
+
+  const spiralW = maxX - minX;
+  const spiralH = maxY - minY;
+
+  const availableW = artboard.w * 0.95;
+  const availableH = artboard.h * 0.95;
+
+  // Only scale down if it exceeds the artboard boundaries.
+  const boundScale = Math.min(availableW / spiralW, availableH / spiralH);
+
+  if (boundScale < 1.0) {
+    for (const im of ready) {
+      im.w = Math.round(im.w * boundScale);
+      im.h = Math.round(im.h * boundScale);
+
+      const dx = im.x + (im.w / boundScale) / 2 - cx;
+      const dy = im.y + (im.h / boundScale) / 2 - cy;
+
+      im.x = Math.round(cx + dx * boundScale - im.w / 2);
+      im.y = Math.round(cy + dy * boundScale - im.h / 2);
+    }
+  }
+}
+
 export function layoutImages() {
   const ready = state.imgs.filter(i => i.p5img);
   if (!ready.length) return;
 
-  if      (state.layoutMode === 'scatter')      layoutScatter(ready);
-  else if (state.layoutMode === 'bricks')       layoutBricks(ready);
-  else if (state.layoutMode === 'cloud')        layoutCloud(ready);
-  else if (state.layoutMode === 'cloudbricks')  layoutCloudBricks(ready);
-  else if (state.layoutMode === 'rows')         layoutRows(ready);
+  if (state.layoutMode === 'scatter') layoutScatter(ready);
+  else if (state.layoutMode === 'bricks') layoutBricks(ready);
+  else if (state.layoutMode === 'cloud') layoutCloud(ready);
+  else if (state.layoutMode === 'cloudbricks') layoutCloudBricks(ready);
+  else if (state.layoutMode === 'rows') layoutRows(ready);
+  else if (state.layoutMode === 'circle') layoutCircle(ready);
+  else if (state.layoutMode === 'spiral') layoutSpiral(ready);
   else layoutMasonry(ready);
 }
 

@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Petri</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.min.js"></script>
+  <script src="https://unpkg.com/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #f5f5f5;
+      font-family: 'Inter', -apple-system, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: #333;
+    }
+
+    #canvas-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8e8e8;
+      position: relative;
+    }
+
+    #canvas-container canvas {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      border-radius: 6px;
+    }
+
+    /* Control Panel */
+    #controls {
+      width: 310px;
+      min-width: 310px;
+      background: #fff;
+      border-left: 1px solid #eee;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #controls::-webkit-scrollbar { width: 4px; }
+    #controls::-webkit-scrollbar-track { background: transparent; }
+    #controls::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+    #controls h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+    }
+
+    #controls .subtitle {
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 400;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #bbb;
+      margin-top: 10px;
+      margin-bottom: 2px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .control-row label {
+      font-size: 12px;
+      font-weight: 400;
+      color: #555;
+    }
+
+    .control-row .value {
+      font-size: 11px;
+      font-weight: 500;
+      color: #999;
+      min-width: 32px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: #eee;
+      outline: none;
+      margin: 2px 0 6px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #333;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #333;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    select {
+      padding: 6px 8px;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      color: #333;
+      background: #fafafa;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select:focus { border-color: #ccc; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    button {
+      flex: 1;
+      padding: 8px 0;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+      border-color: #ddd;
+    }
+
+    button.primary {
+      background: #333;
+      color: #fff;
+      border-color: #333;
+    }
+
+    button.primary:hover {
+      background: #555;
+      border-color: #555;
+    }
+
+    button.danger {
+      color: #e55;
+      border-color: #fdd;
+    }
+
+    button.danger:hover {
+      background: #fef5f5;
+    }
+
+    .divider {
+      height: 1px;
+      background: #f0f0f0;
+      margin: 8px 0;
+    }
+
+    /* Color picker row */
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .color-row label {
+      font-size: 12px;
+      font-weight: 400;
+      color: #555;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 36px;
+      height: 28px;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 2px;
+      background: #fafafa;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
+
+    .color-hex {
+      font-size: 11px;
+      color: #999;
+      font-variant-numeric: tabular-nums;
+      font-family: 'Inter', monospace;
+    }
+
+    /* ── Filter Chain ─────────────────────────── */
+    .filter-add-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .filter-add-row select {
+      flex: 1;
+      margin: 0;
+    }
+
+    .filter-add-row button {
+      flex: none;
+      width: 32px;
+      padding: 0;
+      font-size: 16px;
+      line-height: 32px;
+      border-radius: 6px;
+    }
+
+    #filter-chain {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-card {
+      background: #f8f8f8;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 8px 10px;
+      transition: box-shadow 0.15s;
+    }
+
+    .filter-card:hover {
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+
+    .filter-card-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-card-order {
+      font-size: 10px;
+      font-weight: 600;
+      color: #ccc;
+      min-width: 16px;
+    }
+
+    .filter-card-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #444;
+      flex: 1;
+    }
+
+    .filter-card-val {
+      font-size: 10px;
+      color: #aaa;
+      min-width: 28px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-card-actions {
+      display: flex;
+      gap: 2px;
+      margin-left: 4px;
+    }
+
+    .filter-card-actions button {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      font-size: 11px;
+      line-height: 20px;
+      border-radius: 4px;
+      text-align: center;
+      color: #999;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .filter-card-actions button:hover {
+      background: #eee;
+      border-color: #ddd;
+      color: #555;
+    }
+
+    .filter-card-actions button.fc-remove:hover {
+      background: #fee;
+      border-color: #fcc;
+      color: #e55;
+    }
+
+    .filter-card input[type="range"] {
+      margin: 4px 0 0;
+    }
+
+    .filter-empty {
+      font-size: 11px;
+      color: #ccc;
+      text-align: center;
+      padding: 10px 0;
+      font-style: italic;
+    }
+
+    /* ── Recording ──────────────────────────────── */
+    .rec-btn {
+      background: #fafafa;
+      color: #333;
+      border-color: #e5e5e5;
+    }
+
+    .rec-btn.recording {
+      background: #e53935;
+      color: #fff;
+      border-color: #e53935;
+      animation: rec-pulse 1.2s ease-in-out infinite;
+    }
+
+    .rec-btn.recording:hover {
+      background: #c62828;
+      border-color: #c62828;
+    }
+
+    @keyframes rec-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .rec-progress-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .rec-progress-wrap.active {
+      display: flex;
+    }
+
+    .rec-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .rec-progress-fill {
+      height: 100%;
+      background: #e53935;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.15s;
+    }
+
+    .rec-progress-text {
+      font-size: 10px;
+      color: #999;
+      text-align: center;
+    }
+
+    .rec-settings {
+      display: flex;
+      gap: 6px;
+    }
+
+    .rec-settings select {
+      flex: 1;
+      margin: 0;
+      font-size: 11px;
+      padding: 5px 6px;
+    }
+
+    #fps-display {
+      font-size: 10px;
+      color: #ccc;
+      text-align: center;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div id="controls">
+  <h1>Petri</h1>
+  <p class="subtitle">Random-walker based interactive organism simulator</p>
+
+  <!-- Playback -->
+  <div class="section-label">Playback</div>
+  <div class="btn-row">
+    <button id="btn-pause" class="primary" onclick="togglePause()">Pause</button>
+    <button onclick="clearCanvas()">Clear</button>
+    <button onclick="saveFrame()">Save</button>
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Speed</label>
+      <span class="value" id="val-speed">50</span>
+    </div>
+    <input type="range" id="sl-speed" min="5" max="200" value="50" oninput="updateVal('speed')">
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Frame Rate</label>
+      <span class="value" id="val-fps">30</span>
+    </div>
+    <input type="range" id="sl-fps" min="1" max="60" value="30" oninput="updateVal('fps')">
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Recording -->
+  <div class="section-label">Record MP4</div>
+  <div class="btn-row">
+    <button id="btn-rec" class="rec-btn" onclick="toggleRecording()">Record</button>
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Duration</label>
+      <span class="value" id="val-rec-dur">10s</span>
+    </div>
+    <input type="range" id="sl-rec-dur" min="2" max="60" value="10" oninput="document.getElementById('val-rec-dur').textContent=this.value+'s'">
+  </div>
+
+  <div class="rec-settings">
+    <select id="sel-rec-fps" title="Recording FPS">
+      <option value="24">24 fps</option>
+      <option value="30" selected>30 fps</option>
+      <option value="60">60 fps</option>
+    </select>
+    <select id="sel-rec-quality" title="Quality">
+      <option value="2000000">Low</option>
+      <option value="5000000" selected>Medium</option>
+      <option value="8000000">High</option>
+      <option value="15000000">Ultra</option>
+    </select>
+  </div>
+
+  <div class="rec-progress-wrap" id="rec-progress">
+    <div class="rec-progress-bar">
+      <div class="rec-progress-fill" id="rec-progress-fill"></div>
+    </div>
+    <div class="rec-progress-text" id="rec-progress-text">Preparing...</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Organisms -->
+  <div class="section-label">Organisms</div>
+  <div class="control-group">
+    <div class="control-row">
+      <label>Count</label>
+      <span class="value" id="val-count">100</span>
+    </div>
+    <input type="range" id="sl-count" min="1" max="500" value="100" oninput="updateVal('count')">
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Step Size</label>
+      <span class="value" id="val-step">40</span>
+    </div>
+    <input type="range" id="sl-step" min="1" max="120" value="40" oninput="updateVal('step')">
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Size</label>
+      <span class="value" id="val-size">39</span>
+    </div>
+    <input type="range" id="sl-size" min="1" max="120" value="39" oninput="updateVal('size')">
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Stroke Weight</label>
+      <span class="value" id="val-stroke">2.0</span>
+    </div>
+    <input type="range" id="sl-stroke" min="1" max="80" value="20" oninput="updateVal('stroke')">
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Canvas -->
+  <div class="section-label">Canvas</div>
+  <div class="control-group">
+    <div class="control-row"><label>Ratio</label></div>
+    <select id="sel-ratio" style="width:100%;margin-bottom:6px;" onchange="updateRatio()">
+      <option value="4:5" selected>4 : 5 (Portrait)</option>
+      <option value="1:1">1 : 1 (Square)</option>
+      <option value="16:9">16 : 9 (Landscape)</option>
+      <option value="9:16">9 : 16 (Tall)</option>
+      <option value="3:2">3 : 2 (Classic)</option>
+      <option value="2:3">2 : 3 (Classic Portrait)</option>
+    </select>
+  </div>
+
+  <div class="color-row">
+    <label>Background</label>
+    <input type="color" id="pick-bg" value="#fafafa" oninput="updateBgHex()">
+    <span class="color-hex" id="val-bg-hex">#fafafa</span>
+    <button style="flex:none;padding:4px 8px;font-size:10px;border-radius:5px;" onclick="clearCanvas()" title="Apply background color">Apply</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Filter Chain -->
+  <div class="section-label">Filter Chain</div>
+  <div class="filter-add-row">
+    <select id="sel-add-filter">
+      <option value="BLUR">Blur</option>
+      <option value="POSTERIZE">Posterize</option>
+      <option value="THRESHOLD">Threshold</option>
+      <option value="GRAY">Gray</option>
+      <option value="INVERT">Invert</option>
+      <option value="ERODE">Erode</option>
+      <option value="DILATE">Dilate</option>
+      <option value="OPAQUE">Opaque</option>
+    </select>
+    <button onclick="addFilter()" title="Add filter">+</button>
+  </div>
+
+  <div id="filter-chain">
+    <div class="filter-empty" id="filter-empty-msg">No filters &mdash; add one above</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Colors -->
+  <div class="section-label">Color Mode</div>
+  <div class="control-group">
+    <div class="control-row"><label>Fill</label></div>
+    <select id="sel-fill" style="width:100%;margin-bottom:6px;">
+      <option value="cosmic" selected>Cosmic</option>
+      <option value="pastel">Pastel</option>
+      <option value="neon">Neon</option>
+      <option value="mono">Monochrome</option>
+      <option value="fire">Fire</option>
+      <option value="ocean">Ocean</option>
+      <option value="forest">Forest</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <div class="control-row"><label>Stroke</label></div>
+    <select id="sel-stroke-color" style="width:100%;margin-bottom:6px;">
+      <option value="cosmic" selected>Cosmic</option>
+      <option value="pastel">Pastel</option>
+      <option value="neon">Neon</option>
+      <option value="mono">Monochrome</option>
+      <option value="fire">Fire</option>
+      <option value="ocean">Ocean</option>
+      <option value="forest">Forest</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <div class="control-row">
+      <label>Color Speed</label>
+      <span class="value" id="val-cspeed">1.0</span>
+    </div>
+    <input type="range" id="sl-cspeed" min="1" max="50" value="10" oninput="updateVal('cspeed')">
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="btn-row">
+    <button class="danger" onclick="resetAll()">Reset All</button>
+    <button onclick="randomize()">Randomize</button>
+  </div>
+
+  <div id="fps-display">--</div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────
+let t = 0;
+let walkers = [];
+let paused = false;
+let cnv;
+
+// ── Filter Chain State ─────────────────────────────
+// Each entry: { type: 'BLUR', value: 39, id: unique }
+let filterChain = [];
+let filterIdCounter = 0;
+
+const FILTER_DEFS = {
+  BLUR:      { label: 'Blur',      hasParam: true,  min: 0,  max: 80,  def: 39, display: v => (v/10).toFixed(1), apply: v => v/10 },
+  POSTERIZE: { label: 'Posterize', hasParam: true,  min: 2,  max: 24,  def: 8,  display: v => v,                 apply: v => v },
+  THRESHOLD: { label: 'Threshold', hasParam: true,  min: 0,  max: 100, def: 50, display: v => (v/100).toFixed(2),apply: v => v/100 },
+  GRAY:      { label: 'Gray',      hasParam: false },
+  INVERT:    { label: 'Invert',    hasParam: false },
+  ERODE:     { label: 'Erode',     hasParam: false },
+  DILATE:    { label: 'Dilate',    hasParam: false },
+  OPAQUE:    { label: 'Opaque',    hasParam: false },
+};
+
+function addFilter(type, value) {
+  if (!type) type = document.getElementById('sel-add-filter').value;
+  const def = FILTER_DEFS[type];
+  const entry = {
+    type,
+    value: value !== undefined ? value : (def.hasParam ? def.def : null),
+    id: filterIdCounter++
+  };
+  filterChain.push(entry);
+  renderFilterChain();
+}
+
+function removeFilter(id) {
+  filterChain = filterChain.filter(f => f.id !== id);
+  renderFilterChain();
+}
+
+function moveFilter(id, dir) {
+  const idx = filterChain.findIndex(f => f.id === id);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= filterChain.length) return;
+  [filterChain[idx], filterChain[newIdx]] = [filterChain[newIdx], filterChain[idx]];
+  renderFilterChain();
+}
+
+function updateFilterVal(id, val) {
+  const entry = filterChain.find(f => f.id === id);
+  if (entry) entry.value = parseInt(val);
+  // Update the display
+  const def = FILTER_DEFS[entry.type];
+  const valEl = document.getElementById('fval-' + id);
+  if (valEl && def.hasParam) valEl.textContent = def.display(entry.value);
+}
+
+function renderFilterChain() {
+  const container = document.getElementById('filter-chain');
+  const emptyMsg = filterChain.length === 0
+    ? '<div class="filter-empty" id="filter-empty-msg">No filters &mdash; add one above</div>'
+    : '';
+
+  let html = emptyMsg;
+  filterChain.forEach((f, i) => {
+    const def = FILTER_DEFS[f.type];
+    const num = i + 1;
+    const paramSlider = def.hasParam
+      ? `<input type="range" min="${def.min}" max="${def.max}" value="${f.value}" oninput="updateFilterVal(${f.id}, this.value)">`
+      : '';
+    const valDisplay = def.hasParam ? def.display(f.value) : '';
+
+    html += `
+      <div class="filter-card" data-id="${f.id}">
+        <div class="filter-card-header">
+          <span class="filter-card-order">${num}</span>
+          <span class="filter-card-name">${def.label}</span>
+          <span class="filter-card-val" id="fval-${f.id}">${valDisplay}</span>
+          <div class="filter-card-actions">
+            <button onclick="moveFilter(${f.id},-1)" title="Move up">&uarr;</button>
+            <button onclick="moveFilter(${f.id},1)" title="Move down">&darr;</button>
+            <button class="fc-remove" onclick="removeFilter(${f.id})" title="Remove">&times;</button>
+          </div>
+        </div>
+        ${paramSlider}
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function applyFilterChain() {
+  for (const f of filterChain) {
+    const def = FILTER_DEFS[f.type];
+    const p5Filter = window[f.type]; // p5 globals: BLUR, POSTERIZE, etc.
+    if (def.hasParam) {
+      filter(p5Filter, def.apply(f.value));
+    } else {
+      filter(p5Filter);
+    }
+  }
+}
+
+// ── Value Display ──────────────────────────────────
+function updateVal(id) {
+  const el = document.getElementById('sl-' + id);
+  const vEl = document.getElementById('val-' + id);
+  if (!el || !vEl) return;
+  let v = el.value;
+  if (id === 'stroke') v = (v / 10).toFixed(1);
+  if (id === 'cspeed') v = (v / 10).toFixed(1);
+  vEl.textContent = v;
+
+  if (id === 'fps') frameRate(parseInt(el.value));
+  if (id === 'count') syncWalkers();
+}
+
+function updateBgHex() {
+  const hex = document.getElementById('pick-bg').value;
+  document.getElementById('val-bg-hex').textContent = hex;
+}
+
+function getBgColor() {
+  const hex = document.getElementById('pick-bg').value;
+  const r = parseInt(hex.substring(1, 3), 16);
+  const g = parseInt(hex.substring(3, 5), 16);
+  const b = parseInt(hex.substring(5, 7), 16);
+  return [r, g, b];
+}
+
+function sl(id) { return parseInt(document.getElementById('sl-' + id).value); }
+function slF(id) { return parseFloat(document.getElementById('sl-' + id).value); }
+
+// ── Walker Sync ────────────────────────────────────
+function syncWalkers() {
+  const target = sl('count');
+  while (walkers.length < target) walkers.push(new RandomWalker());
+  while (walkers.length > target) walkers.pop();
+}
+
+// ── Canvas Ratio ───────────────────────────────────
+function getCanvasSize() {
+  const container = document.getElementById('canvas-container');
+  const cw = container.clientWidth;
+  const ch = container.clientHeight;
+  const padding = 40;
+  const maxW = cw - padding;
+  const maxH = ch - padding;
+
+  const ratio = document.getElementById('sel-ratio').value;
+  const [rw, rh] = ratio.split(':').map(Number);
+  const aspect = rw / rh;
+
+  let w, h;
+  if (maxW / maxH > aspect) {
+    h = maxH;
+    w = h * aspect;
+  } else {
+    w = maxW;
+    h = w / aspect;
+  }
+  return [Math.floor(w), Math.floor(h)];
+}
+
+function updateRatio() {
+  const [w, h] = getCanvasSize();
+  resizeCanvas(w, h);
+  const bg = getBgColor();
+  background(bg[0], bg[1], bg[2]);
+  for (const wr of walkers) {
+    wr.x = constrain(wr.x, 0, w - 1);
+    wr.y = constrain(wr.y, 0, h - 1);
+  }
+}
+
+// ── Color Palettes ─────────────────────────────────
+function getColor(mode, t, cs, offset1, offset2, offset3) {
+  const s = cs;
+  switch (mode) {
+    case 'cosmic':
+      return [
+        200 + 10 * cos(t * s * 0.999 - t),
+        127 + 127 * cos(t * s * 0.9922 + t),
+        127 + 127 * cos(t * s * 0.9 * t)
+      ];
+    case 'pastel':
+      return [
+        190 + 60 * sin(t * s * 0.5 + offset1),
+        180 + 60 * cos(t * s * 0.7 + offset2),
+        200 + 50 * sin(t * s * 0.3 + offset3)
+      ];
+    case 'neon':
+      return [
+        127 + 127 * sin(t * s * 1.5 + offset1),
+        50 + 50 * cos(t * s * 2.0 + offset2),
+        127 + 127 * cos(t * s * 1.8 + offset3)
+      ];
+    case 'mono': {
+      const v = 127 + 127 * cos(t * s * 0.8 + offset1);
+      return [v, v, v];
+    }
+    case 'fire':
+      return [
+        200 + 55 * sin(t * s * 0.6),
+        80 + 80 * cos(t * s * 0.9 + 1),
+        20 + 30 * sin(t * s * 1.2 + 2)
+      ];
+    case 'ocean':
+      return [
+        30 + 40 * sin(t * s * 0.4),
+        100 + 80 * cos(t * s * 0.6 + 1),
+        180 + 70 * sin(t * s * 0.8 + 2)
+      ];
+    case 'forest':
+      return [
+        40 + 50 * sin(t * s * 0.5),
+        120 + 80 * cos(t * s * 0.7 + 1),
+        50 + 40 * sin(t * s * 0.3 + 2)
+      ];
+    default:
+      return [127, 127, 127];
+  }
+}
+
+function getStrokeColor(mode, t, cs, offset1, offset2, offset3) {
+  const s = cs;
+  switch (mode) {
+    case 'cosmic':
+      return [
+        127 + 127 * cos(t * s * 0.4888 + t),
+        127 + 127 * tan(t * s * 0.9922 + t),
+        127 + 127 * cos(t * s * 0.9 + t)
+      ];
+    case 'pastel':
+      return [
+        160 + 80 * cos(t * s * 0.6 + offset1),
+        150 + 80 * sin(t * s * 0.5 + offset2),
+        170 + 70 * cos(t * s * 0.4 + offset3)
+      ];
+    case 'neon':
+      return [
+        200 + 55 * cos(t * s * 2.0 + offset1),
+        30 + 30 * sin(t * s * 1.5 + offset2),
+        200 + 55 * sin(t * s * 1.8 + offset3)
+      ];
+    case 'mono': {
+      const v = 80 + 100 * sin(t * s * 0.6 + offset1);
+      return [v, v, v];
+    }
+    case 'fire':
+      return [
+        220 + 35 * cos(t * s * 0.8),
+        120 + 60 * sin(t * s * 1.1 + 1),
+        10 + 20 * cos(t * s * 1.4 + 2)
+      ];
+    case 'ocean':
+      return [
+        20 + 30 * cos(t * s * 0.5),
+        80 + 60 * sin(t * s * 0.7 + 1),
+        150 + 90 * cos(t * s * 0.9 + 2)
+      ];
+    case 'forest':
+      return [
+        30 + 40 * cos(t * s * 0.6),
+        100 + 60 * sin(t * s * 0.8 + 1),
+        40 + 30 * cos(t * s * 0.4 + 2)
+      ];
+    default:
+      return [100, 100, 100];
+  }
+}
+
+// ── Buttons ────────────────────────────────────────
+function togglePause() {
+  paused = !paused;
+  document.getElementById('btn-pause').textContent = paused ? 'Play' : 'Pause';
+  if (paused) noLoop(); else loop();
+}
+
+function clearCanvas() {
+  const bg = getBgColor();
+  background(bg[0], bg[1], bg[2]);
+  for (const w of walkers) {
+    w.x = width / 2;
+    w.y = height / 2;
+  }
+}
+
+function saveFrame() {
+  saveCanvas(cnv, `petri-${nf(frameCount, 6)}`, 'png');
+}
+
+function resetAll() {
+  document.getElementById('sl-speed').value = 50;
+  document.getElementById('sl-fps').value = 30;
+  document.getElementById('sl-count').value = 100;
+  document.getElementById('sl-step').value = 40;
+  document.getElementById('sl-size').value = 39;
+  document.getElementById('sl-stroke').value = 20;
+  document.getElementById('sl-cspeed').value = 10;
+  document.getElementById('pick-bg').value = '#fafafa';
+  document.getElementById('val-bg-hex').textContent = '#fafafa';
+  document.getElementById('sel-ratio').value = '4:5';
+  document.getElementById('sel-fill').value = 'cosmic';
+  document.getElementById('sel-stroke-color').value = 'cosmic';
+
+  // Reset filter chain to default single blur
+  filterChain = [];
+  filterIdCounter = 0;
+  addFilter('BLUR', 39);
+
+  ['speed','fps','count','step','size','stroke','cspeed'].forEach(updateVal);
+  frameRate(30);
+  syncWalkers();
+  updateRatio();
+  clearCanvas();
+}
+
+function randomize() {
+  const randInt = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const setSlider = (id, v) => { document.getElementById('sl-' + id).value = v; updateVal(id); };
+
+  setSlider('speed', randInt(10, 150));
+  setSlider('count', randInt(5, 300));
+  setSlider('step', randInt(3, 80));
+  setSlider('size', randInt(5, 80));
+  setSlider('stroke', randInt(5, 50));
+  setSlider('cspeed', randInt(2, 40));
+
+  // Random filter chain
+  filterChain = [];
+  filterIdCounter = 0;
+  const allTypes = Object.keys(FILTER_DEFS);
+  const numFilters = randInt(1, 4);
+  for (let i = 0; i < numFilters; i++) {
+    const type = allTypes[randInt(0, allTypes.length - 1)];
+    const def = FILTER_DEFS[type];
+    const val = def.hasParam ? randInt(def.min, def.max) : null;
+    addFilter(type, val);
+  }
+
+  // Random bg color
+  const rHex = () => randInt(0, 255).toString(16).padStart(2, '0');
+  const bgHex = '#' + rHex() + rHex() + rHex();
+  document.getElementById('pick-bg').value = bgHex;
+  document.getElementById('val-bg-hex').textContent = bgHex;
+
+  const modes = ['cosmic','pastel','neon','mono','fire','ocean','forest'];
+  document.getElementById('sel-fill').value = modes[randInt(0, modes.length - 1)];
+  document.getElementById('sel-stroke-color').value = modes[randInt(0, modes.length - 1)];
+
+  syncWalkers();
+  clearCanvas();
+}
+
+// ── p5.js ──────────────────────────────────────────
+function setup() {
+  const [w, h] = getCanvasSize();
+  cnv = createCanvas(w, h);
+  cnv.parent('canvas-container');
+  background(250);
+  smooth();
+  frameRate(30);
+
+  for (let i = 0; i < 100; i++) {
+    walkers.push(new RandomWalker());
+  }
+
+  // Default filter: one blur
+  addFilter('BLUR', 39);
+}
+
+function draw() {
+  const nbrFrames = 205 - sl('speed');
+  t = frameCount / nbrFrames;
+
+  const stepMax = sl('step');
+  const sizeMax = sl('size');
+  const cs = slF('cspeed') / 10;
+
+  const fillMode = document.getElementById('sel-fill').value;
+  const strokeMode = document.getElementById('sel-stroke-color').value;
+  const sw = slF('stroke') / 10;
+
+  for (const w of walkers) {
+    w.step(int(random(stepMax) * noise(1) * abs(cos(tan(PI * t * 0.999991)))));
+    w.form(int(sizeMax * noise(1) * abs(cos(sin(PI * t * 0.999991)))), fillMode, strokeMode, cs, sw);
+  }
+
+  // Apply filter chain in order
+  applyFilterChain();
+
+  // FPS display
+  if (frameCount % 10 === 0) {
+    document.getElementById('fps-display').textContent = `${Math.round(frameRate())} fps`;
+  }
+}
+
+function windowResized() {
+  updateRatio();
+}
+
+function keyPressed() {
+  if (key === 's') saveFrame();
+  if (key === ' ') togglePause();
+}
+
+// ── Recording Engine ───────────────────────────────
+let isRecording = false;
+let recAborted = false;
+const useWebCodecs = typeof VideoEncoder !== 'undefined';
+
+function toggleRecording() {
+  if (isRecording) {
+    recAborted = true;
+    return;
+  }
+  startRecording();
+}
+
+async function startRecording() {
+  const recDuration = parseInt(document.getElementById('sl-rec-dur').value);
+  const recFps = parseInt(document.getElementById('sel-rec-fps').value);
+  const recBitrate = parseInt(document.getElementById('sel-rec-quality').value);
+  const totalFrames = recDuration * recFps;
+
+  isRecording = true;
+  recAborted = false;
+
+  // UI
+  const btn = document.getElementById('btn-rec');
+  btn.textContent = 'Stop';
+  btn.classList.add('recording');
+  const progressWrap = document.getElementById('rec-progress');
+  const progressFill = document.getElementById('rec-progress-fill');
+  const progressText = document.getElementById('rec-progress-text');
+  progressWrap.classList.add('active');
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Preparing encoder...';
+
+  // Pause live drawing
+  noLoop();
+
+  const canvasEl = document.querySelector('#canvas-container canvas');
+  const w = canvasEl.width;
+  const h = canvasEl.height;
+
+  // Ensure even dimensions (H.264 requirement)
+  const encW = w % 2 === 0 ? w : w - 1;
+  const encH = h % 2 === 0 ? h : h - 1;
+
+  let blob;
+
+  try {
+    if (useWebCodecs) {
+      blob = await recordWebCodecs(canvasEl, totalFrames, recFps, recBitrate, encW, encH, progressFill, progressText);
+    } else {
+      blob = await recordWasm(canvasEl, totalFrames, recFps, recBitrate, encW, encH, progressFill, progressText);
+    }
+  } catch (err) {
+    console.error('Recording error:', err);
+    progressText.textContent = 'Error: ' + err.message;
+    finishRecordingUI();
+    return;
+  }
+
+  if (blob && !recAborted) {
+    progressText.textContent = 'Downloading...';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `petri-${Date.now()}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    progressText.textContent = 'Done!';
+  } else if (recAborted) {
+    progressText.textContent = 'Stopped.';
+  }
+
+  finishRecordingUI();
+}
+
+function finishRecordingUI() {
+  isRecording = false;
+  recAborted = false;
+  const btn = document.getElementById('btn-rec');
+  btn.textContent = 'Record';
+  btn.classList.remove('recording');
+  if (!paused) loop();
+  setTimeout(() => {
+    document.getElementById('rec-progress').classList.remove('active');
+  }, 2000);
+}
+
+// Render one frame offline (advances the simulation by one step)
+function renderOneFrame() {
+  const nbrFrames = 205 - sl('speed');
+  // Manually increment p5's frameCount
+  window._p5Instance ? window._p5Instance._frameCount++ : null;
+  // We'll use our own counter for time
+  t = frameCount / nbrFrames;
+
+  const stepMax = sl('step');
+  const sizeMax = sl('size');
+  const cs = slF('cspeed') / 10;
+  const fillMode = document.getElementById('sel-fill').value;
+  const strokeMode = document.getElementById('sel-stroke-color').value;
+  const sw = slF('stroke') / 10;
+
+  for (const w of walkers) {
+    w.step(int(random(stepMax) * noise(1) * abs(cos(tan(PI * t * 0.999991)))));
+    w.form(int(sizeMax * noise(1) * abs(cos(sin(PI * t * 0.999991)))), fillMode, strokeMode, cs, sw);
+  }
+
+  applyFilterChain();
+}
+
+// ── WebCodecs + mp4-muxer ──────────────────────────
+async function recordWebCodecs(canvasEl, totalFrames, fps, bitrate, w, h, progressFill, progressText) {
+  const target = new Mp4Muxer.ArrayBufferTarget();
+  const muxer = new Mp4Muxer.Muxer({
+    target,
+    video: { codec: 'avc', width: w, height: h },
+    fastStart: 'in-memory'
+  });
+
+  let encodedCount = 0;
+
+  const encoder = new VideoEncoder({
+    output: (chunk, meta) => {
+      muxer.addVideoChunk(chunk, meta);
+      encodedCount++;
+    },
+    error: (e) => { throw e; }
+  });
+
+  encoder.configure({
+    codec: 'avc1.42001f',
+    width: w,
+    height: h,
+    bitrate: bitrate,
+    framerate: fps,
+    hardwareAcceleration: 'prefer-hardware'
+  });
+
+  for (let i = 0; i < totalFrames; i++) {
+    if (recAborted) break;
+
+    // Render a frame
+    redraw();
+
+    const timestamp = i * (1_000_000 / fps); // microseconds
+    const frame = new VideoFrame(canvasEl, { timestamp });
+    encoder.encode(frame, { keyFrame: i % (fps * 2) === 0 });
+    frame.close();
+
+    // Update progress
+    const pct = ((i + 1) / totalFrames * 100);
+    progressFill.style.width = pct + '%';
+    progressText.textContent = `Recording ${i + 1} / ${totalFrames} frames`;
+
+    // Yield to browser every 4 frames
+    if (i % 4 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  await encoder.flush();
+  encoder.close();
+  muxer.finalize();
+
+  if (recAborted) return null;
+  return new Blob([target.buffer], { type: 'video/mp4' });
+}
+
+// ── h264-mp4-encoder (WASM fallback) ───────────────
+async function recordWasm(canvasEl, totalFrames, fps, bitrate, w, h, progressFill, progressText) {
+  progressText.textContent = 'Loading WASM encoder...';
+  const encoder = await HME.createH264MP4Encoder();
+  encoder.width = w;
+  encoder.height = h;
+  encoder.frameRate = fps;
+  // Map bitrate to quantization: lower QP = higher quality
+  // 15M→10, 8M→15, 5M→20, 2M→28
+  const qp = bitrate >= 15000000 ? 10 : bitrate >= 8000000 ? 15 : bitrate >= 5000000 ? 20 : 28;
+  encoder.quantizationParameter = qp;
+  encoder.initialize();
+
+  const ctx = canvasEl.getContext('2d');
+
+  for (let i = 0; i < totalFrames; i++) {
+    if (recAborted) break;
+
+    redraw();
+
+    const imgData = ctx.getImageData(0, 0, w, h);
+    encoder.addFrameRgba(imgData.data);
+
+    const pct = ((i + 1) / totalFrames * 100);
+    progressFill.style.width = pct + '%';
+    progressText.textContent = `Recording ${i + 1} / ${totalFrames} frames`;
+
+    if (i % 2 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  if (recAborted) { encoder.delete(); return null; }
+
+  progressText.textContent = 'Encoding MP4...';
+  encoder.finalize();
+  const data = encoder.FS.readFile(encoder.outputFilename);
+  encoder.delete();
+
+  return new Blob([data], { type: 'video/mp4' });
+}
+
+// ── Walker Class ───────────────────────────────────
+class RandomWalker {
+  constructor() {
+    this.x = width / 2;
+    this.y = height / 2;
+  }
+
+  form(r, fillMode, strokeMode, cs, sw) {
+    const fc = getColor(fillMode, t, cs, 0, 1, 2);
+    fill(fc[0], fc[1], fc[2]);
+
+    const sc1 = getStrokeColor(strokeMode, t, cs, 0, 1, 2);
+    strokeWeight(sw);
+    stroke(sc1[0], sc1[1], sc1[2]);
+    circle(this.x, this.y, r * 0.5);
+
+    const sc2 = getStrokeColor(strokeMode, t, cs, 3, 4, 5);
+    stroke(sc2[0], sc2[1], sc2[2]);
+    strokeWeight(r / 3);
+    point(this.x, this.y);
+    strokeWeight(r / 6);
+    point(this.x, this.y);
+
+    const sc3 = getStrokeColor(strokeMode, t, cs, 6, 7, 8);
+    stroke(sc3[0], sc3[1], sc3[2]);
+    strokeWeight(r / 2);
+    ellipse(this.x, this.y, r, r);
+  }
+
+  step(stepSize) {
+    const choice = int(random(4));
+    if (choice === 0) this.x += stepSize;
+    else if (choice === 1) this.y += stepSize;
+    else if (choice === 2) this.x -= stepSize;
+    else this.y -= stepSize;
+    this.x = constrain(this.x, 0, width - 1);
+    this.y = constrain(this.y, 0, height - 1);
+  }
+}
+</script>
+</body>
+</html>

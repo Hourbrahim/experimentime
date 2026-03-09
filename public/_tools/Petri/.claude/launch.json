@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "random-walkers",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npx-cli.js", "http-server", ".", "-p", "8081", "-c-1"],
+      "port": 8081
+    }
+  ]
+}
