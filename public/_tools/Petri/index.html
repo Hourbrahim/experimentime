@@ -583,6 +583,31 @@
 
   <div class="divider"></div>
 
+  <!-- Blend Mode -->
+  <div class="section-label">Blend Mode</div>
+  <div class="control-group">
+    <select id="sel-blend" style="width:100%;margin-bottom:6px;" onchange="applyBlendMode()">
+      <option value="BLEND" selected>Blend (default)</option>
+      <option value="ADD">Add</option>
+      <option value="DARKEST">Darkest</option>
+      <option value="LIGHTEST">Lightest</option>
+      <option value="DIFFERENCE">Difference</option>
+      <option value="EXCLUSION">Exclusion</option>
+      <option value="MULTIPLY">Multiply</option>
+      <option value="SCREEN">Screen</option>
+      <option value="REPLACE">Replace</option>
+      <option value="REMOVE">Remove</option>
+      <option value="OVERLAY">Overlay</option>
+      <option value="HARD_LIGHT">Hard Light</option>
+      <option value="SOFT_LIGHT">Soft Light</option>
+      <option value="DODGE">Dodge</option>
+      <option value="BURN">Burn</option>
+      <option value="SUBTRACT">Subtract</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+
   <!-- Colors -->
   <div class="section-label">Color Mode</div>
   <div class="control-group">
@@ -730,6 +755,11 @@ function applyFilterChain() {
       filter(p5Filter);
     }
   }
+}
+
+function applyBlendMode() {
+  const mode = document.getElementById('sel-blend').value;
+  blendMode(window[mode]);
 }
 
 // ── Value Display ──────────────────────────────────
@@ -940,6 +970,10 @@ function resetAll() {
   filterIdCounter = 0;
   addFilter('BLUR', 39);
 
+  // Reset blend mode
+  document.getElementById('sel-blend').value = 'BLEND';
+  blendMode(BLEND);
+
   ['speed','fps','count','step','size','stroke','cspeed'].forEach(updateVal);
   frameRate(30);
   syncWalkers();
@@ -979,6 +1013,12 @@ function randomize() {
   const modes = ['cosmic','pastel','neon','mono','fire','ocean','forest'];
   document.getElementById('sel-fill').value = modes[randInt(0, modes.length - 1)];
   document.getElementById('sel-stroke-color').value = modes[randInt(0, modes.length - 1)];
+
+  // Random blend mode
+  const blendModes = ['BLEND','ADD','DARKEST','LIGHTEST','DIFFERENCE','EXCLUSION','MULTIPLY','SCREEN','REPLACE','OVERLAY','HARD_LIGHT','SOFT_LIGHT','DODGE','BURN','SUBTRACT'];
+  const randBlend = blendModes[randInt(0, blendModes.length - 1)];
+  document.getElementById('sel-blend').value = randBlend;
+  blendMode(window[randBlend]);
 
   syncWalkers();
   clearCanvas();
