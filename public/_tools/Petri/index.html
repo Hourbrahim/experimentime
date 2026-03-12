@@ -575,7 +575,7 @@
       <option value="POSTERIZE">Posterize</option>
       <option value="THRESHOLD">Threshold</option>
       <option value="GRAY">Gray</option>
-      <option value="INVERT">Invert</option>
+      <option value="INVERT">Invert ⚠ flash</option>
       <option value="ERODE">Erode</option>
       <option value="DILATE">Dilate</option>
       <option value="OPAQUE">Opaque</option>
@@ -601,14 +601,9 @@
       <option value="EXCLUSION">Exclusion</option>
       <option value="MULTIPLY">Multiply</option>
       <option value="SCREEN">Screen</option>
-      <option value="REPLACE">Replace</option>
-      <option value="REMOVE">Remove</option>
       <option value="OVERLAY">Overlay</option>
       <option value="HARD_LIGHT">Hard Light</option>
       <option value="SOFT_LIGHT">Soft Light</option>
-      <option value="DODGE">Dodge</option>
-      <option value="BURN">Burn</option>
-      <option value="SUBTRACT">Subtract</option>
     </select>
   </div>
 
@@ -999,10 +994,10 @@ function randomize() {
   setSlider('stroke', randInt(5, 50));
   setSlider('cspeed', randInt(2, 40));
 
-  // Random filter chain
+  // Random filter chain (exclude INVERT — causes flashing)
   filterChain = [];
   filterIdCounter = 0;
-  const allTypes = Object.keys(FILTER_DEFS);
+  const allTypes = Object.keys(FILTER_DEFS).filter(t => t !== 'INVERT');
   const numFilters = randInt(1, 4);
   for (let i = 0; i < numFilters; i++) {
     const type = allTypes[randInt(0, allTypes.length - 1)];
@@ -1022,7 +1017,7 @@ function randomize() {
   document.getElementById('sel-stroke-color').value = modes[randInt(0, modes.length - 1)];
 
   // Random blend mode
-  const blendModes = ['BLEND','ADD','DARKEST','LIGHTEST','DIFFERENCE','EXCLUSION','MULTIPLY','SCREEN','REPLACE','OVERLAY','HARD_LIGHT','SOFT_LIGHT','DODGE','BURN','SUBTRACT'];
+  const blendModes = ['BLEND','ADD','DARKEST','LIGHTEST','DIFFERENCE','EXCLUSION','MULTIPLY','SCREEN','OVERLAY','HARD_LIGHT','SOFT_LIGHT'];
   const randBlend = blendModes[randInt(0, blendModes.length - 1)];
   document.getElementById('sel-blend').value = randBlend;
   blendMode(window[randBlend]);
