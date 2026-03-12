@@ -7,7 +7,7 @@ const statusLabel: Record<Tool["status"], string> = {
 };
 
 export function ToolCard({ tool }: { tool: Tool }) {
-  const href = tool.embedSrc ?? `/tools/${tool.slug}`;
+  const href = tool.status === "active" && tool.embedSrc ? `/${tool.slug}` : `/tools/${tool.slug}`;
 
   return (
     <Link
