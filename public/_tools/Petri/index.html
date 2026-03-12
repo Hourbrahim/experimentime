@@ -1017,7 +1017,7 @@ function randomize() {
   document.getElementById('sel-stroke-color').value = modes[randInt(0, modes.length - 1)];
 
   // Random blend mode
-  const blendModes = ['BLEND','ADD','DARKEST','LIGHTEST','DIFFERENCE','EXCLUSION','MULTIPLY','SCREEN','OVERLAY','HARD_LIGHT','SOFT_LIGHT'];
+  const blendModes = ['BLEND','ADD','LIGHTEST','DIFFERENCE','EXCLUSION','MULTIPLY','SCREEN','OVERLAY','HARD_LIGHT','SOFT_LIGHT'];
   const randBlend = blendModes[randInt(0, blendModes.length - 1)];
   document.getElementById('sel-blend').value = randBlend;
   blendMode(window[randBlend]);
