@@ -61,11 +61,13 @@ body {
 
 /* ── Sidebar controls ── */
 #controls {
-  width: 260px;
-  min-width: 260px;
+  width: 280px;
+  min-width: 200px;
+  max-width: 40vw;
   height: 100vh;
   overflow-y: auto;
-  padding: 16px 20px 16px 14px;
+  overflow-x: hidden;
+  padding: 16px 18px 16px 14px;
   background: #111;
   border-left: 1px solid #222;
   display: flex;
@@ -73,6 +75,7 @@ body {
   gap: 6px;
   scrollbar-width: thin;
   scrollbar-color: #333 transparent;
+  resize: horizontal;
 }
 
 #controls::-webkit-scrollbar {
