@@ -25,6 +25,7 @@
   <!-- Hidden video element for video mode -->
   <video id="video-source" style="display:none;"></video>
 
+  <div id="resize-handle"></div>
   <div id="controls">
     <div class="tool-title">Opimg</div>
     <div class="tool-sub">op art image &amp; video filter</div>
@@ -209,6 +210,34 @@
   <script src="sketch.js?v=2"></script>
   <script src="video.js?v=2"></script>
   <script src="controls.js?v=2"></script>
+  <script>
+  (function(){
+    const handle = document.getElementById('resize-handle');
+    const panel = document.getElementById('controls');
+    let dragging = false;
+    handle.addEventListener('mousedown', function(e){
+      dragging = true;
+      handle.classList.add('active');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      const w = window.innerWidth - e.clientX;
+      const clamped = Math.max(200, Math.min(w, window.innerWidth * 0.4));
+      panel.style.width = clamped + 'px';
+      if(typeof windowResized === 'function') windowResized();
+    });
+    document.addEventListener('mouseup', function(){
+      if(!dragging) return;
+      dragging = false;
+      handle.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    });
+  })();
+  </script>
 </body>
 
 </html>
