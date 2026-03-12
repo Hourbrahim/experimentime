@@ -440,7 +440,19 @@
   <p class="subtitle">Random-walker based interactive organism simulator</p>
 
   <div class="btn-row">
-    <button onclick="randomize()">Randomize</button>
+    <button onclick="randomize()" style="background:#111;color:#fff;">Randomize</button>
+  </div>
+
+  <div class="control-group">
+    <div class="control-row"><label>Ratio</label></div>
+    <select id="sel-ratio" style="width:100%;margin-bottom:6px;" onchange="updateRatio()">
+      <option value="4:5" selected>4 : 5 (Portrait)</option>
+      <option value="1:1">1 : 1 (Square)</option>
+      <option value="16:9">16 : 9 (Landscape)</option>
+      <option value="9:16">9 : 16 (Tall)</option>
+      <option value="3:2">3 : 2 (Classic)</option>
+      <option value="2:3">2 : 3 (Classic Portrait)</option>
+    </select>
   </div>
 
   <!-- Playback -->
@@ -545,17 +557,6 @@
 
   <!-- Canvas -->
   <div class="section-label">Canvas</div>
-  <div class="control-group">
-    <div class="control-row"><label>Ratio</label></div>
-    <select id="sel-ratio" style="width:100%;margin-bottom:6px;" onchange="updateRatio()">
-      <option value="4:5" selected>4 : 5 (Portrait)</option>
-      <option value="1:1">1 : 1 (Square)</option>
-      <option value="16:9">16 : 9 (Landscape)</option>
-      <option value="9:16">9 : 16 (Tall)</option>
-      <option value="3:2">3 : 2 (Classic)</option>
-      <option value="2:3">2 : 3 (Classic Portrait)</option>
-    </select>
-  </div>
 
   <div class="color-row">
     <label>Background</label>
