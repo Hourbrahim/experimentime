@@ -110,7 +110,7 @@ function handleFile(file) {
     }
 }
 
-/* ── Render mode toggle (Lines / Chars) ── */
+/* ── Render mode toggle (Lines / Chars / ASCII) ── */
 document.getElementById('mode-toggle').addEventListener('click', e => {
     const btn = e.target.closest('.mode-btn');
     if (!btn) return;
@@ -154,6 +154,15 @@ document.getElementById('btn-save').addEventListener('click', () => {
 document.getElementById('btn-save-svg').addEventListener('click', () => {
     if (!photoLoaded) return;
     exportSVG();
+});
+
+document.getElementById('btn-live-record').addEventListener('click', () => {
+    if (!photoLoaded && !videoReady) return;
+    if (isRecordingLive) {
+        stopLiveRecording();
+    } else {
+        startLiveRecording();
+    }
 });
 
 /* ── Video playback controls ── */

@@ -16,7 +16,7 @@ const DEFAULTS = {
 };
 
 /* ── Helpers to read slider values ── */
-function sl(id)  { return parseInt(document.getElementById('sl-' + id).value); }
+function sl(id) { return parseInt(document.getElementById('sl-' + id).value); }
 function slF(id) { return parseFloat(document.getElementById('sl-' + id).value); }
 
 /* ── Compute render dims that fit the source aspect within the canvas ── */
@@ -41,19 +41,21 @@ function getRenderDims(srcW, srcH) {
 /* ── Read all current control values into an object ── */
 function getParams() {
   return {
-    res:       sl('res'),
-    thresh:    sl('thresh'),
-    bAdj:      sl('bright'),
-    expo:      slF('exposure') / 10,
-    cont:      slF('contrast') / 10,
-    inv:       sl('invert') === 1,
-    useColor:  sl('colorize') === 1,
+    res: sl('res'),
+    thresh: sl('thresh'),
+    bAdj: sl('bright'),
+    expo: slF('exposure') / 10,
+    cont: slF('contrast') / 10,
+    inv: sl('invert') === 1,
+    useColor: sl('colorize') === 1,
     strokeCol: document.getElementById('col-stroke').value,
-    bgCol:     document.getElementById('col-bg').value,
-    strokeW:   slF('stroke') / 10,
-    chr:       document.getElementById('char-input').value || '/'
+    bgCol: document.getElementById('col-bg').value,
+    strokeW: slF('stroke') / 10,
+    chr: document.getElementById('char-input').value || '/'
   };
 }
+
+const ASCII_CHARS = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 
 /* ── Core op-art render — works on any p5 graphics target & source image ── */
 function renderOpArt(target, source, srcW, srcH, outW, outH, p) {
@@ -64,14 +66,24 @@ function renderOpArt(target, source, srcW, srcH, outW, outH, p) {
   const tsX = outW / resX;
   const tsY = outH / resY;
 
-  const tmp = source.get();
-  tmp.resize(resX, resY);
+  if (!window._opimgTmpGraphics) {
+    window._opimgTmpGraphics = createGraphics(resX, resY);
+  }
+  const tmp = window._opimgTmpGraphics;
+  if (tmp.width !== resX || tmp.height !== resY) {
+    tmp.resizeCanvas(resX, resY);
+  }
+
+  // Clear previous frame just in case, before drawing the new image
+  tmp.clear();
+  tmp.image(source, 0, 0, resX, resY);
   tmp.loadPixels();
+  const pixels = tmp.pixels;
 
   for (let x = 0; x < resX; x++) {
     for (let y = 0; y < resY; y++) {
       const idx = (y * resX + x) * 4;
-      let r = tmp.pixels[idx], g = tmp.pixels[idx + 1], b = tmp.pixels[idx + 2];
+      let r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2];
 
       let br = 0.299 * r + 0.587 * g + 0.114 * b;
       br = Math.pow(br / 255, 1 / p.expo) * 255;
@@ -105,11 +117,18 @@ function renderOpArt(target, source, srcW, srcH, outW, outH, p) {
         } else {
           target.line(x * tsX, y * tsY, (x + 1) * tsX, (y + 1) * tsY);
         }
-      } else {
+      } else if (renderMode === 'chars') {
         target.noStroke();
         const sz = map(br, 0, 255, 2, Math.min(tsX, tsY) * 1.1);
         target.textSize(sz);
         target.text(p.chr, x * tsX + tsX / 2, y * tsY + tsY / 2);
+      } else if (renderMode === 'ascii') {
+        target.noStroke();
+        const charIndex = Math.floor(map(br, 0, 255, 0, ASCII_CHARS.length - 1));
+        const asciiChar = ASCII_CHARS.charAt(charIndex);
+        const sz = Math.min(tsX, tsY) * 1.2;
+        target.textSize(sz);
+        target.text(asciiChar, x * tsX + tsX / 2, y * tsY + tsY / 2);
       }
     }
   }
@@ -128,14 +147,14 @@ function renderToBuffer() {
 
 /* ── SVG export ── */
 function exportSVG() {
-  const p   = getParams();
+  const p = getParams();
   const outW = photoW, outH = photoH;
   const aspect = photoW / photoH;
   const tileBase = (aspect >= 1 ? outW : outH) / p.res;
   const resX = Math.max(1, Math.round(outW / tileBase));
   const resY = Math.max(1, Math.round(outH / tileBase));
-  const tsX  = outW / resX;
-  const tsY  = outH / resY;
+  const tsX = outW / resX;
+  const tsY = outH / resY;
 
   const tmp = photo.get();
   tmp.resize(resX, resY);
@@ -166,13 +185,18 @@ function exportSVG() {
 
       if (renderMode === 'lines') {
         if (br >= p.thresh) {
-          lines.push(`<line x1="${(x+1)*tsX}" y1="${y*tsY}" x2="${x*tsX}" y2="${(y+1)*tsY}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`);
+          lines.push(`<line x1="${(x + 1) * tsX}" y1="${y * tsY}" x2="${x * tsX}" y2="${(y + 1) * tsY}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`);
         } else {
-          lines.push(`<line x1="${x*tsX}" y1="${y*tsY}" x2="${(x+1)*tsX}" y2="${(y+1)*tsY}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`);
+          lines.push(`<line x1="${x * tsX}" y1="${y * tsY}" x2="${(x + 1) * tsX}" y2="${(y + 1) * tsY}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`);
         }
-      } else {
+      } else if (renderMode === 'chars') {
         const sz = mapVal(br, 0, 255, 2, Math.min(tsX, tsY) * 1.1);
-        lines.push(`<text x="${x*tsX + tsX/2}" y="${y*tsY + tsY/2}" fill="${col}" font-size="${sz}" text-anchor="middle" dominant-baseline="central" font-family="monospace">${escapeXml(p.chr)}</text>`);
+        lines.push(`<text x="${x * tsX + tsX / 2}" y="${y * tsY + tsY / 2}" fill="${col}" font-size="${sz}" text-anchor="middle" dominant-baseline="central" font-family="monospace">${escapeXml(p.chr)}</text>`);
+      } else if (renderMode === 'ascii') {
+        const charIndex = Math.floor(mapVal(br, 0, 255, 0, ASCII_CHARS.length - 1));
+        const asciiChar = ASCII_CHARS.charAt(charIndex);
+        const sz = Math.min(tsX, tsY) * 1.2;
+        lines.push(`<text x="${x * tsX + tsX / 2}" y="${y * tsY + tsY / 2}" fill="${col}" font-size="${sz}" text-anchor="middle" dominant-baseline="central" font-family="monospace">${escapeXml(asciiChar)}</text>`);
       }
     }
   }
@@ -206,7 +230,7 @@ function setup() {
 
 function draw() {
   const p = getParams();
-  background(p.bgCol);
+  background(0); // Canvas border stays black
 
   /* ── Video mode ── */
   if (inputMode === 'video' && videoReady) {
@@ -214,6 +238,13 @@ function draw() {
     if (!photo) return;
     const { rw, rh, ox, oy } = getRenderDims(videoW, videoH);
     if (rw <= 0 || rh <= 0) return;
+
+    // Background color only on artwork zone
+    push();
+    noStroke();
+    fill(p.bgCol);
+    rect(ox, oy, rw, rh);
+    pop();
 
     push();
     translate(ox, oy);
@@ -230,6 +261,13 @@ function draw() {
   const { rw, rh, ox, oy } = getRenderDims(photoW, photoH);
   if (rw <= 0 || rh <= 0) return;
 
+  // Background color only on artwork zone
+  push();
+  noStroke();
+  fill(p.bgCol);
+  rect(ox, oy, rw, rh);
+  pop();
+
   push();
   translate(ox, oy);
   renderOpArt(window, photo, photoW, photoH, rw, rh, p);
@@ -239,4 +277,213 @@ function draw() {
 function windowResized() {
   const container = document.getElementById('canvas-container');
   resizeCanvas(container.offsetWidth, container.offsetHeight);
+}
+
+/* ── Live Canvas Recording → MP4 via WebCodecs ── */
+let isRecordingLive = false;
+let liveRecTimeout = null;
+let liveFrames = [];        // stored as ImageBitmap[]
+let liveRecStartTime = 0;
+let liveRecFps = 30;
+let liveRecInterval = null;
+let _liveRecPg = null;      // reusable offscreen buffer for hi-res capture
+
+/* Render current state to an offscreen buffer at source resolution */
+function captureHiResFrame() {
+  const srcW = (inputMode === 'video') ? videoW : photoW;
+  const srcH = (inputMode === 'video') ? videoH : photoH;
+  if (srcW <= 0 || srcH <= 0 || !photo) return null;
+
+  // Reuse / resize the offscreen graphics
+  if (!_liveRecPg || _liveRecPg.width !== srcW || _liveRecPg.height !== srcH) {
+    if (_liveRecPg) _liveRecPg.remove();
+    _liveRecPg = createGraphics(srcW, srcH);
+    _liveRecPg.pixelDensity(1);
+  }
+
+  const pg = _liveRecPg;
+  const p = getParams();
+  pg.background(p.bgCol);
+  pg.textFont('monospace');
+  pg.textAlign(CENTER, CENTER);
+  renderOpArt(pg, photo, srcW, srcH, srcW, srcH, p);
+  return pg;
+}
+
+function startLiveRecording() {
+  if (isRecordingLive) return;
+
+  // Validate we have media loaded
+  const srcW = (inputMode === 'video') ? videoW : photoW;
+  const srcH = (inputMode === 'video') ? videoH : photoH;
+  if (srcW <= 0 || srcH <= 0) return;
+
+  const durStr = document.getElementById('inp-live-dur').value;
+  const durationMs = Math.max(1000, parseInt(durStr) * 1000);
+  liveRecFps = 30;
+
+  liveFrames = [];
+  isRecordingLive = true;
+  liveRecStartTime = performance.now();
+
+  const btn = document.getElementById('btn-live-record');
+  btn.classList.add('recording');
+  btn.textContent = '⏺ Recording...';
+
+  // Capture hi-res frames at target FPS by rendering offscreen at source dimensions
+  liveRecInterval = setInterval(() => {
+    if (!isRecordingLive) return;
+    const pg = captureHiResFrame();
+    if (!pg) return;
+    // Get the underlying canvas and create an ImageBitmap from it
+    const srcCanvas = pg.elt || pg.canvas;
+    if (srcCanvas) {
+      createImageBitmap(srcCanvas).then(bmp => {
+        liveFrames.push(bmp);
+      });
+    }
+  }, 1000 / liveRecFps);
+
+  // Auto stop after duration
+  liveRecTimeout = setTimeout(() => {
+    stopLiveRecording();
+  }, durationMs);
+}
+
+function stopLiveRecording() {
+  if (!isRecordingLive) return;
+  isRecordingLive = false;
+  if (liveRecInterval) { clearInterval(liveRecInterval); liveRecInterval = null; }
+  if (liveRecTimeout) { clearTimeout(liveRecTimeout); liveRecTimeout = null; }
+
+  const btn = document.getElementById('btn-live-record');
+  btn.classList.remove('recording');
+  btn.textContent = 'Encoding MP4...';
+
+  encodeLiveFramesToMP4().then(() => {
+    btn.textContent = 'Record Interaction';
+  }).catch(err => {
+    console.error('Live encode error:', err);
+    btn.textContent = 'Record Interaction';
+  });
+}
+
+async function encodeLiveFramesToMP4() {
+  if (liveFrames.length === 0) return;
+
+  const progressWrap = document.getElementById('live-rec-progress');
+  const progressFill = document.getElementById('live-rec-progress-fill');
+  const progressText = document.getElementById('live-rec-progress-text');
+  progressWrap.classList.add('active');
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Encoding...';
+
+  const firstFrame = liveFrames[0];
+  const w = Math.floor(firstFrame.width / 2) * 2;
+  const h = Math.floor(firstFrame.height / 2) * 2;
+  const totalFrames = liveFrames.length;
+  const fps = liveRecFps;
+
+  const useWC = typeof VideoEncoder !== 'undefined';
+
+  let blob;
+  if (useWC) {
+    blob = await encodeLiveWebCodecs(w, h, fps, totalFrames, progressFill, progressText);
+  } else {
+    blob = await encodeLiveWasm(w, h, fps, totalFrames, progressFill, progressText);
+  }
+
+  // Cleanup frames
+  liveFrames.forEach(f => f.close());
+  liveFrames = [];
+
+  if (blob) {
+    progressText.textContent = 'Downloading...';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `opimg-interaction-${Date.now()}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    progressText.textContent = 'Done!';
+  }
+
+  setTimeout(() => progressWrap.classList.remove('active'), 2000);
+}
+
+async function encodeLiveWebCodecs(w, h, fps, totalFrames, progressFill, progressText) {
+  const target = new Mp4Muxer.ArrayBufferTarget();
+  const muxer = new Mp4Muxer.Muxer({
+    target,
+    video: { codec: 'avc', width: w, height: h },
+    fastStart: 'in-memory'
+  });
+
+  const encoder = new VideoEncoder({
+    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    error: e => console.error('VideoEncoder error:', e)
+  });
+
+  encoder.configure({
+    codec: 'avc1.640033',
+    width: w, height: h,
+    bitrate: 15_000_000,
+    framerate: fps,
+    hardwareAcceleration: 'prefer-hardware'
+  });
+
+  // Need an offscreen canvas to draw ImageBitmaps at even dimensions
+  const oc = new OffscreenCanvas(w, h);
+  const octx = oc.getContext('2d');
+
+  for (let i = 0; i < totalFrames; i++) {
+    octx.drawImage(liveFrames[i], 0, 0, w, h);
+    const timestamp = i * (1_000_000 / fps);
+    const frame = new VideoFrame(oc, { timestamp });
+    encoder.encode(frame, { keyFrame: i % (fps * 2) === 0 });
+    frame.close();
+
+    const pct = ((i + 1) / totalFrames * 100);
+    progressFill.style.width = pct + '%';
+    progressText.textContent = `Encoding ${i + 1} / ${totalFrames}`;
+    if (i % 4 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  await encoder.flush();
+  encoder.close();
+  muxer.finalize();
+  return new Blob([target.buffer], { type: 'video/mp4' });
+}
+
+async function encodeLiveWasm(w, h, fps, totalFrames, progressFill, progressText) {
+  progressText.textContent = 'Loading WASM encoder...';
+  const encoder = await HME.createH264MP4Encoder();
+  encoder.width = w;
+  encoder.height = h;
+  encoder.frameRate = fps;
+  encoder.quantizationParameter = 12;
+  encoder.initialize();
+
+  const oc = document.createElement('canvas');
+  oc.width = w; oc.height = h;
+  const octx = oc.getContext('2d');
+
+  for (let i = 0; i < totalFrames; i++) {
+    octx.drawImage(liveFrames[i], 0, 0, w, h);
+    const imgData = octx.getImageData(0, 0, w, h);
+    encoder.addFrameRgba(imgData.data);
+
+    const pct = ((i + 1) / totalFrames * 100);
+    progressFill.style.width = pct + '%';
+    progressText.textContent = `Encoding ${i + 1} / ${totalFrames}`;
+    if (i % 2 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  progressText.textContent = 'Finalizing MP4...';
+  encoder.finalize();
+  const data = encoder.FS.readFile(encoder.outputFilename);
+  encoder.delete();
+  return new Blob([data], { type: 'video/mp4' });
 }

@@ -1,166 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opimg</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opimg</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.min.js"></script>
+  <script src="https://unpkg.com/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js"></script>
 </head>
+
 <body>
 
-<div id="canvas-container">
-  <div id="drop-zone">
-    <div class="arrow">&darr;</div>
-    <div>drop image or click upload</div>
-  </div>
-</div>
-
-<!-- Hidden video element for video mode -->
-<video id="video-source" style="display:none;"></video>
-
-<div id="controls">
-  <div class="tool-title">Opimg</div>
-  <div class="tool-sub">op art image &amp; video filter</div>
-
-  <hr class="divider">
-
-  <!-- ── Input Mode (Image / Video) ── -->
-  <div class="section-label">Input</div>
-  <div class="mode-toggle" id="input-mode-toggle">
-    <button class="mode-btn active" data-mode="image">Image</button>
-    <button class="mode-btn" data-mode="video">Video</button>
-  </div>
-
-  <hr class="divider">
-
-  <button class="btn-primary" id="btn-upload">Upload Image</button>
-  <input type="file" id="file-input" accept="image/*" style="display:none">
-
-  <hr class="divider">
-
-  <!-- ── Render Mode (Lines / Chars) ── -->
-  <div class="section-label">Render Mode</div>
-  <div class="mode-toggle" id="mode-toggle">
-    <button class="mode-btn active" data-mode="lines">Lines</button>
-    <button class="mode-btn" data-mode="chars">Chars</button>
-  </div>
-
-  <div id="char-section" style="display:none;">
-    <div class="section-label">Character</div>
-    <input type="text" id="char-input" value="" maxlength="2" placeholder="type a character">
-  </div>
-
-  <hr class="divider">
-  <div class="section-label">Grid</div>
-
-  <div class="control-row">
-    <label>Resolution</label>
-    <input type="range" id="sl-res" min="10" max="200" value="80">
-    <span class="val" id="val-res">80</span>
-  </div>
-
-  <div class="control-row">
-    <label>Stroke</label>
-    <input type="range" id="sl-stroke" min="1" max="40" value="16" step="1">
-    <span class="val" id="val-stroke">1.6</span>
-  </div>
-
-  <hr class="divider">
-  <div class="section-label">Image</div>
-
-  <div class="control-row">
-    <label>Threshold</label>
-    <input type="range" id="sl-thresh" min="0" max="255" value="100">
-    <span class="val" id="val-thresh">100</span>
-  </div>
-
-  <div class="control-row">
-    <label>Brightness</label>
-    <input type="range" id="sl-bright" min="-100" max="100" value="0">
-    <span class="val" id="val-bright">0</span>
-  </div>
-
-  <div class="control-row">
-    <label>Exposure</label>
-    <input type="range" id="sl-exposure" min="1" max="30" value="10">
-    <span class="val" id="val-exposure">1.0</span>
-  </div>
-
-  <div class="control-row">
-    <label>Contrast</label>
-    <input type="range" id="sl-contrast" min="1" max="30" value="10">
-    <span class="val" id="val-contrast">1.0</span>
-  </div>
-
-  <div class="control-row">
-    <label>Invert</label>
-    <input type="range" id="sl-invert" min="0" max="1" value="0" step="1">
-    <span class="val" id="val-invert">off</span>
-  </div>
-
-  <hr class="divider">
-  <div class="section-label">Colors</div>
-
-  <div class="color-row">
-    <input type="color" id="col-stroke" value="#ffffff">
-    <label>Stroke</label>
-  </div>
-  <div class="color-row">
-    <input type="color" id="col-bg" value="#000000">
-    <label>Background</label>
-  </div>
-
-  <div class="control-row">
-    <label>Colorize</label>
-    <input type="range" id="sl-colorize" min="0" max="1" value="0" step="1">
-    <span class="val" id="val-colorize">off</span>
-  </div>
-
-  <hr class="divider">
-
-  <!-- ── Video Playback Controls (visible in video mode only) ── -->
-  <div id="video-controls-section" class="video-section">
-    <div class="section-label">Playback</div>
-    <div class="video-playback-row">
-      <button id="btn-play-pause">▶</button>
-      <input type="range" id="video-scrubber" min="0" max="1000" value="0">
+  <div id="canvas-container">
+    <div id="drop-zone">
+      <div class="arrow">&darr;</div>
+      <div>drop image or click upload</div>
     </div>
-    <div class="video-time">
-      <span id="video-current-time">0:00</span>
-      <span id="video-total-time">0:00</span>
-    </div>
+  </div>
+
+  <!-- Hidden video element for video mode -->
+  <video id="video-source" style="display:none;"></video>
+
+  <div id="controls">
+    <div class="tool-title">Opimg</div>
+    <div class="tool-sub">op art image &amp; video filter</div>
+
     <hr class="divider">
-  </div>
 
-  <!-- ── Image Export (hidden in video mode) ── -->
-  <div id="image-export-section" class="image-export-section">
-    <div class="section-label">Export</div>
-    <div class="btn-row">
-      <button id="btn-save">Save PNG</button>
-      <button id="btn-save-svg">Save SVG</button>
+    <!-- ── Input Mode (Image / Video) ── -->
+    <div class="section-label">Input</div>
+    <div class="mode-toggle" id="input-mode-toggle">
+      <button class="mode-btn active" data-mode="image">Image</button>
+      <button class="mode-btn" data-mode="video">Video</button>
+    </div>
+
+    <hr class="divider">
+
+    <button class="btn-primary" id="btn-upload">Upload Image</button>
+    <input type="file" id="file-input" accept="image/*" style="display:none">
+
+    <hr class="divider">
+
+    <!-- ── Render Mode (Lines / Chars) ── -->
+    <div class="section-label">Render Mode</div>
+    <div class="mode-toggle" id="mode-toggle">
+      <button class="mode-btn active" data-mode="lines">Lines</button>
+      <button class="mode-btn" data-mode="chars">Chars</button>
+      <button class="mode-btn" data-mode="ascii">ASCII</button>
+    </div>
+
+    <div id="char-section" style="display:none;">
+      <div class="section-label">Character</div>
+      <input type="text" id="char-input" value="" maxlength="2" placeholder="type a character">
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Grid</div>
+
+    <div class="control-row">
+      <label>Resolution</label>
+      <input type="range" id="sl-res" min="10" max="200" value="80">
+      <span class="val" id="val-res">80</span>
+    </div>
+
+    <div class="control-row">
+      <label>Stroke</label>
+      <input type="range" id="sl-stroke" min="1" max="40" value="16" step="1">
+      <span class="val" id="val-stroke">1.6</span>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Image</div>
+
+    <div class="control-row">
+      <label>Threshold</label>
+      <input type="range" id="sl-thresh" min="0" max="255" value="100">
+      <span class="val" id="val-thresh">100</span>
+    </div>
+
+    <div class="control-row">
+      <label>Brightness</label>
+      <input type="range" id="sl-bright" min="-100" max="100" value="0">
+      <span class="val" id="val-bright">0</span>
+    </div>
+
+    <div class="control-row">
+      <label>Exposure</label>
+      <input type="range" id="sl-exposure" min="1" max="30" value="10">
+      <span class="val" id="val-exposure">1.0</span>
+    </div>
+
+    <div class="control-row">
+      <label>Contrast</label>
+      <input type="range" id="sl-contrast" min="1" max="30" value="10">
+      <span class="val" id="val-contrast">1.0</span>
+    </div>
+
+    <div class="control-row">
+      <label>Invert</label>
+      <input type="range" id="sl-invert" min="0" max="1" value="0" step="1">
+      <span class="val" id="val-invert">off</span>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Colors</div>
+
+    <div class="color-row">
+      <input type="color" id="col-stroke" value="#ffffff">
+      <label>Stroke</label>
+    </div>
+    <div class="color-row">
+      <input type="color" id="col-bg" value="#000000">
+      <label>Background</label>
+    </div>
+
+    <div class="control-row">
+      <label>Colorize</label>
+      <input type="range" id="sl-colorize" min="0" max="1" value="0" step="1">
+      <span class="val" id="val-colorize">off</span>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── Video Playback Controls (visible in video mode only) ── -->
+    <div id="video-controls-section" class="video-section">
+      <div class="section-label">Playback</div>
+      <div class="video-playback-row">
+        <button id="btn-play-pause">▶</button>
+        <input type="range" id="video-scrubber" min="0" max="1000" value="0">
+      </div>
+      <div class="video-time">
+        <span id="video-current-time">0:00</span>
+        <span id="video-total-time">0:00</span>
+      </div>
+      <hr class="divider">
+    </div>
+
+    <!-- ── Live Recording (always visible if media is loaded) ── -->
+    <div id="live-record-section" class="live-record-section">
+      <div class="section-label">Record Interaction</div>
+      <div class="control-row" style="margin-bottom:8px">
+        <label>Duration (s)</label>
+        <input type="number" id="inp-live-dur" min="1" max="600" value="5"
+          style="width: 50px; background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 4px; padding: 2px 4px; font-family: monospace; font-size: 11px;">
+      </div>
+      <div class="rec-progress-wrap" id="live-rec-progress">
+        <div class="rec-progress-bar">
+          <div class="rec-progress-fill" id="live-rec-progress-fill"></div>
+        </div>
+        <div class="rec-progress-text" id="live-rec-progress-text">Encoding...</div>
+      </div>
+      <button id="btn-live-record" class="btn-record">Record Interaction</button>
+    </div>
+
+    <!-- ── Image Export (hidden in video mode) ── -->
+    <div id="image-export-section" class="image-export-section">
+      <div class="section-label">Image Export</div>
+      <div class="btn-row">
+        <button id="btn-save">Save PNG</button>
+        <button id="btn-save-svg">Save SVG</button>
+      </div>
+    </div>
+
+    <!-- ── Video Export (visible in video mode) ── -->
+    <div id="video-export-section" class="video-export-section">
+      <div class="section-label">Video Export</div>
+      <div class="control-row" style="margin-bottom:6px">
+        <label>Duration (s)</label>
+        <input type="number" id="inp-video-dur" min="1" max="600" value=""
+          placeholder="full"
+          style="width: 60px; background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 4px; padding: 2px 4px; font-family: monospace; font-size: 11px;">
+      </div>
+      <div class="rec-settings">
+        <select id="sel-rec-fps" title="Recording FPS">
+          <option value="24">24 fps</option>
+          <option value="30" selected>30 fps</option>
+          <option value="60">60 fps</option>
+        </select>
+        <select id="sel-rec-quality" title="Quality">
+          <option value="8000000">Medium</option>
+          <option value="15000000" selected>High</option>
+          <option value="25000000">Ultra</option>
+        </select>
+      </div>
+      <div class="rec-progress-wrap" id="rec-progress">
+        <div class="rec-progress-bar">
+          <div class="rec-progress-fill" id="rec-progress-fill"></div>
+        </div>
+        <div class="rec-progress-text" id="rec-progress-text">Preparing...</div>
+      </div>
+      <button id="btn-export-video" class="btn-record">Export Video</button>
+    </div>
+
+    <hr class="divider">
+
+    <button id="btn-reset">Reset</button>
+
+    <hr class="divider">
+    <div class="info-text">
+      Drop an image/video or click upload. Adjust controls to shape the op art effect.
     </div>
   </div>
 
-  <!-- ── Video Export (visible in video mode) ── -->
-  <div id="video-export-section" class="video-export-section">
-    <div class="section-label">Export</div>
-    <button id="btn-export-video" class="btn-record">Export Video</button>
-  </div>
-
-  <hr class="divider">
-
-  <button id="btn-reset">Reset</button>
-
-  <hr class="divider">
-  <div class="info-text">
-    Drop an image/video or click upload. Adjust controls to shape the op art effect.
-  </div>
-</div>
-
-<script src="sketch.js"></script>
-<script src="video.js"></script>
-<script src="controls.js"></script>
+  <script src="sketch.js?v=2"></script>
+  <script src="video.js?v=2"></script>
+  <script src="controls.js?v=2"></script>
 </body>
+
 </html>
