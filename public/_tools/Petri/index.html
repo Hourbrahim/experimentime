@@ -442,8 +442,9 @@
   <!-- Playback -->
   <div class="section-label">Playback</div>
   <div class="btn-row">
-    <button id="btn-pause" class="primary" onclick="togglePause()">Pause</button>
+    <button id="btn-pause" onclick="togglePause()" title="Pause"><span style="font-size:16px">&#x23F8;&#xFE0E;</span></button>
     <button onclick="clearCanvas()">Clear</button>
+    <button onclick="resetAll()">Reset</button>
     <button onclick="saveFrame()">Save</button>
   </div>
 
@@ -468,7 +469,7 @@
   <!-- Recording -->
   <div class="section-label">Record MP4</div>
   <div class="btn-row">
-    <button id="btn-rec" class="rec-btn" onclick="toggleRecording()">Record</button>
+    <button id="btn-rec" class="rec-btn" onclick="toggleRecording()" title="Record"><span style="color:#e53935;font-size:18px">&#x23FA;&#xFE0E;</span></button>
   </div>
 
   <div class="control-group">
@@ -934,7 +935,9 @@ function getStrokeColor(mode, t, cs, offset1, offset2, offset3) {
 // ── Buttons ────────────────────────────────────────
 function togglePause() {
   paused = !paused;
-  document.getElementById('btn-pause').textContent = paused ? 'Play' : 'Pause';
+  const btn = document.getElementById('btn-pause');
+  btn.innerHTML = paused ? '<span style="font-size:16px">&#x25B6;&#xFE0E;</span>' : '<span style="font-size:16px">&#x23F8;&#xFE0E;</span>';
+  btn.title = paused ? 'Play' : 'Pause';
   if (paused) noLoop(); else loop();
 }
 
@@ -1100,7 +1103,7 @@ async function startRecording() {
 
   // UI
   const btn = document.getElementById('btn-rec');
-  btn.textContent = 'Stop';
+  btn.innerHTML = '<span style="font-size:18px">&#x23F9;&#xFE0E;</span>';
   btn.classList.add('recording');
   const progressWrap = document.getElementById('rec-progress');
   const progressFill = document.getElementById('rec-progress-fill');
@@ -1157,7 +1160,7 @@ function finishRecordingUI() {
   isRecording = false;
   recAborted = false;
   const btn = document.getElementById('btn-rec');
-  btn.textContent = 'Record';
+  btn.innerHTML = '<span style="color:#e53935;font-size:18px">&#x23FA;&#xFE0E;</span>';
   btn.classList.remove('recording');
   if (!paused) loop();
   setTimeout(() => {

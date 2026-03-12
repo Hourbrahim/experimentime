@@ -30,4 +30,11 @@ export const tools: Tool[] = [
     description: "Random-walker based interactive organism simulator",
     embedSrc: "/_tools/Petri/index.html",
   },
+  {
+    name: "Opimg",
+    slug: "opimg",
+    status: "active",
+    description: "Op art image filter tool",
+    embedSrc: "/_tools/Opimg/index.html",
+  },
 ];
