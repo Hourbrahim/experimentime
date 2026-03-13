@@ -18,7 +18,7 @@ var prevMX = 0, prevMY = 0;
 let myFont;
 
 function preload() {
-  myFont = loadFont('inter.woff2');
+  myFont = loadFont('inter.ttf');
 }
 
 function setup() {
@@ -84,6 +84,26 @@ function draw() {
   }
 }
 
+// ── 3x3 rotation matrix helpers for vertex mode ──
+function mat3RotZ(a) {
+  var c = Math.cos(a), s = Math.sin(a);
+  return [c, -s, 0, s, c, 0, 0, 0, 1];
+}
+function mat3RotY(a) {
+  var c = Math.cos(a), s = Math.sin(a);
+  return [c, 0, s, 0, 1, 0, -s, 0, c];
+}
+function mat3Mul(a, b) {
+  return [
+    a[0]*b[0]+a[1]*b[3]+a[2]*b[6], a[0]*b[1]+a[1]*b[4]+a[2]*b[7], a[0]*b[2]+a[1]*b[5]+a[2]*b[8],
+    a[3]*b[0]+a[4]*b[3]+a[5]*b[6], a[3]*b[1]+a[4]*b[4]+a[5]*b[7], a[3]*b[2]+a[4]*b[5]+a[5]*b[8],
+    a[6]*b[0]+a[7]*b[3]+a[8]*b[6], a[6]*b[1]+a[7]*b[4]+a[8]*b[7], a[6]*b[2]+a[7]*b[5]+a[8]*b[8]
+  ];
+}
+function mat3Vec(m, x, y, z) {
+  return [m[0]*x + m[1]*y + m[2]*z, m[3]*x + m[4]*y + m[5]*z, m[6]*x + m[7]*y + m[8]*z];
+}
+
 function drawOrbit(p, t) {
   var l1 = PI * p.loops;
   var d1 = p.density;
@@ -94,62 +114,74 @@ function drawOrbit(p, t) {
   var vertexMode = p.drawMode === 'vertex';
 
   if (vertexMode) {
+    // Vertex mode: compute world-space positions manually so cumulative
+    // rotations are baked into each vertex (p5 only applies the final
+    // matrix to all vertices, losing the per-step winding).
+    var m = [1,0,0, 0,1,0, 0,0,1]; // identity
+    var rza = 4.2 * cos(0.00001 * TWO_PI * (t / l1 * r));
+    var rya = 100 * cos(0.00001 * TWO_PI * (t / l1 * r));
+    var stepRot = mat3Mul(mat3RotZ(rza), mat3RotY(rya));
+
     noFill();
     strokeWeight(p.strokeWeight);
     if (!sinCol) stroke(p.elemColor);
     beginShape();
+
+    var idx = 0;
+    for (var i = 0; i <= l1; i += d1) {
+      m = mat3Mul(m, stepRot);
+
+      var px = r * sin(2 * PI * t + i);
+      var pz = r * cos(2 * PI * t + i);
+      var wp = mat3Vec(m, px, 0, pz);
+
+      if (sinCol) {
+        var cr = 127 + 127 * sin(p.freqR * idx * 100 - t * 4);
+        var cg = 127 + 127 * cos(p.freqG * idx * 100 + t * 5);
+        var cb = 127 + 127 * cos(p.freqB * idx * 100 + t * 3);
+        stroke(cr, cg, cb);
+      }
+
+      vertex(wp[0], wp[1], wp[2]);
+      idx++;
+    }
+    endShape();
   } else {
+    // Dots / character mode: use p5 cumulative rotations + push/pop
     noStroke();
     if (charMode) {
       textFont(myFont);
       textAlign(CENTER, CENTER);
-      textSize(max(sz * 3, 6));
-    }
-  }
-
-  var idx = 0;
-  var lastColor = [255, 255, 255];
-
-  for (var i = 0; i <= l1; i += d1) {
-    // cumulative rotations create the 3D toroidal winding
-    // MUST be outside push/pop to accumulate across the whole orbit
-    rotateZ(4.2 * cos(0.00001 * TWO_PI * (t / l1 * r)));
-    rotateY(100 * cos(0.00001 * TWO_PI * (t / l1 * r)));
-
-    var cr, cg, cb;
-    if (sinCol) {
-      cr = 127 + 127 * sin(p.freqR * idx * 100 - t * 4);
-      cg = 127 + 127 * cos(p.freqG * idx * 100 + t * 5);
-      cb = 127 + 127 * cos(p.freqB * idx * 100 + t * 3);
-      lastColor = [cr, cg, cb];
+      textSize(max(sz * 4, 8));
     }
 
-    var px = r * sin(2 * PI * t + i);
-    var py = 0;
-    var pz = r * cos(2 * PI * t + i);
+    var idx = 0;
+    for (var i = 0; i <= l1; i += d1) {
+      rotateZ(4.2 * cos(0.00001 * TWO_PI * (t / l1 * r)));
+      rotateY(100 * cos(0.00001 * TWO_PI * (t / l1 * r)));
 
-    if (vertexMode) {
-      if (sinCol) stroke(cr, cg, cb);
-      vertex(px, py, pz);
-    } else {
+      var cr, cg, cb;
+      if (sinCol) {
+        cr = 127 + 127 * sin(p.freqR * idx * 100 - t * 4);
+        cg = 127 + 127 * cos(p.freqG * idx * 100 + t * 5);
+        cb = 127 + 127 * cos(p.freqB * idx * 100 + t * 3);
+      }
+
+      var px = r * sin(2 * PI * t + i);
+      var pz = r * cos(2 * PI * t + i);
+
       push();
       if (sinCol) fill(cr, cg, cb);
       else fill(p.elemColor);
-
-      translate(px, py, pz);
-
+      translate(px, 0, pz);
       if (charMode) {
         text(p.charVal, 0, 0);
       } else {
         ellipse(0, 0, sz, sz);
       }
       pop();
+      idx++;
     }
-    idx++;
-  }
-
-  if (vertexMode) {
-    endShape();
   }
 }
 
