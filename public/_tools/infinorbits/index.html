@@ -80,6 +80,18 @@
             <span class="val" id="radiusVal">100</span>
           </div>
           <div class="ctrl-row">
+            <span class="ctrl-label">Draw Mode</span>
+            <select id="drawMode">
+              <option value="dots">Dots</option>
+              <option value="vertex">Vertex Mode</option>
+            </select>
+          </div>
+          <div id="strokeWeightRow" class="ctrl-row hidden">
+            <span class="ctrl-label">Stroke</span>
+            <input type="range" id="strokeWeight" min="0.1" max="10" value="1" step="0.1">
+            <span class="val" id="strokeWeightVal">1.0</span>
+          </div>
+          <div class="ctrl-row">
             <span class="ctrl-label">Element</span>
             <input type="text" id="charVal" value="" placeholder="Leave empty for dot" class="char-input">
           </div>

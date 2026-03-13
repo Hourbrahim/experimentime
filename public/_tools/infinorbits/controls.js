@@ -8,6 +8,8 @@ window.params = {
   density: 0.031,
   radius: 100,
   charVal: '',
+  drawMode: 'dots',
+  strokeWeight: 1,
   speed: 1,
   loopFrames: 600,
   colorMode: 'solid',
@@ -78,11 +80,18 @@ document.addEventListener('DOMContentLoaded', function () {
     perspective(PI / 3, w / h, 1, 5000);
   }
 
+  // ── Mode Control ──
+  $('drawMode').addEventListener('change', function (e) {
+    p.drawMode = e.target.value;
+    $('strokeWeightRow').classList.toggle('hidden', e.target.value !== 'vertex');
+  });
+
   // ── Geometry ──
   bindSlider('loops', 'loops', 'loopsVal');
   bindSlider('pointSize', 'pointSize', 'pointSizeVal');
   bindSlider('density', 'density', 'densityVal');
   bindSlider('radius', 'radius', 'radiusVal');
+  bindSlider('strokeWeight', 'strokeWeight', 'strokeWeightVal', function (v) { return v.toFixed(1); });
 
   $('charVal').addEventListener('input', function (e) {
     p.charVal = e.target.value;
@@ -189,7 +198,7 @@ function startWebmRecording() {
 
   document.getElementById('exportStop').addEventListener('click', function () {
     clearInterval(interval);
-    try { recorder.stop(); } catch (e) {}
+    try { recorder.stop(); } catch (e) { }
     paused = true;
   }, { once: true });
 }

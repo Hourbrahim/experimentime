@@ -15,6 +15,12 @@ var camDist = 400;
 var dragging = false;
 var prevMX = 0, prevMY = 0;
 
+let myFont;
+
+function preload() {
+  myFont = loadFont('inter.woff2');
+}
+
 function setup() {
   var p = window.params;
   setAttributes('preserveDrawingBuffer', true);
@@ -26,7 +32,7 @@ function setup() {
   // fallback loop for headless/background tabs where rAF doesn't fire
   setTimeout(function () {
     if (frameCount < 2) {
-      window._fallbackLoop = setInterval(function () { try { redraw(); } catch (e) {} }, 16);
+      window._fallbackLoop = setInterval(function () { try { redraw(); } catch (e) { } }, 16);
     }
   }, 500);
 }
@@ -85,17 +91,35 @@ function drawOrbit(p, t) {
   var sz = p.pointSize;
   var sinCol = p.colorMode === 'sinusoidal';
   var charMode = p.charVal && p.charVal.length > 0;
+  var vertexMode = p.drawMode === 'vertex';
 
-  noStroke();
-
-  // set text properties once outside the loop for performance
-  if (charMode) {
-    textAlign(CENTER, CENTER);
-    textSize(max(sz * 3, 6));
+  if (vertexMode) {
+    noFill();
+    strokeWeight(p.strokeWeight);
+    if (!sinCol) stroke(p.elemColor);
+    beginShape();
+  } else {
+    noStroke();
+    if (charMode) {
+      textFont(myFont);
+      textAlign(CENTER, CENTER);
+      textSize(max(sz * 3, 6));
+    }
   }
 
   var idx = 0;
+  var lastColor = [255, 255, 255];
+
   for (var i = 0; i <= l1; i += d1) {
+    var cr, cg, cb;
+    if (sinCol) {
+      cr = 127 + 127 * sin(p.freqR * idx * 100 - t * 4);
+      cg = 127 + 127 * cos(p.freqG * idx * 100 + t * 5);
+      cb = 127 + 127 * cos(p.freqB * idx * 100 + t * 3);
+      lastColor = [cr, cg, cb];
+    }
+
+    push();
     // cumulative rotations create the 3D toroidal winding
     rotateZ(4.2 * cos(0.00001 * TWO_PI * (t / l1 * r)));
     rotateY(100 * cos(0.00001 * TWO_PI * (t / l1 * r)));
@@ -104,27 +128,30 @@ function drawOrbit(p, t) {
     var py = 0;
     var pz = r * cos(2 * PI * t + i);
 
-    // color
-    if (sinCol) {
-      var cr = 127 + 127 * sin(p.freqR * idx * 100 - t * 4);
-      var cg = 127 + 127 * cos(p.freqG * idx * 100 + t * 5);
-      var cb = 127 + 127 * cos(p.freqB * idx * 100 + t * 3);
-      fill(cr, cg, cb);
+    if (vertexMode) {
+      // In WEBGL, vertex colors are supported when passed individually, or we can just draw paths
+      // Note: p5 WEBGL doesn't perfectly support auto-gradient lines without custom shaders.
+      // We'll apply stroke color if solid, otherwise we just let the line build. 
+      if (sinCol) stroke(cr, cg, cb);
+      vertex(px, py, pz);
     } else {
-      fill(p.elemColor);
+      if (sinCol) fill(cr, cg, cb);
+      else fill(p.elemColor);
+
+      translate(px, py, pz);
+
+      if (charMode) {
+        text(p.charVal, 0, 0);
+      } else {
+        ellipse(0, 0, sz, sz);
+      }
     }
-
-    push();
-    translate(px, py, pz);
-
-    if (charMode) {
-      text(p.charVal, 0, 0);
-    } else {
-      ellipse(0, 0, sz, sz);
-    }
-
     pop();
     idx++;
+  }
+
+  if (vertexMode) {
+    endShape();
   }
 }
 
