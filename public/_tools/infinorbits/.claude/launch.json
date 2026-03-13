@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "infinorbits",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["D:/Fun/infinorbits/server.js"],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}

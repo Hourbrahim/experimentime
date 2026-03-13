@@ -37,4 +37,11 @@ export const tools: Tool[] = [
     description: "Op art image filter tool",
     embedSrc: "/_tools/Opimg/index.html",
   },
+  {
+    name: "Infinorbits",
+    slug: "infinorbits",
+    status: "active",
+    description: "3D particle orbit animation generator",
+    embedSrc: "/_tools/infinorbits/index.html",
+  },
 ];

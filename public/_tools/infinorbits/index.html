@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinorbits</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container"></div>
+
+    <div id="controls">
+      <div class="panel-header">
+        <span class="logo">Infinorbits</span>
+      </div>
+
+      <!-- ── Canvas ── -->
+      <div class="section">
+        <div class="section-head" data-toggle="canvasBody">
+          <h3>Canvas</h3>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="canvasBody" class="section-body">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Ratio</span>
+            <select id="canvasRatio">
+              <option value="1:1" data-w="600" data-h="600">1:1 &mdash; 600 &times; 600</option>
+              <option value="4:5" data-w="1080" data-h="1350">4:5 &mdash; 1080 &times; 1350</option>
+              <option value="9:16" data-w="1080" data-h="1920">9:16 &mdash; 1080 &times; 1920</option>
+              <option value="16:9" data-w="1920" data-h="1080">16:9 &mdash; 1920 &times; 1080</option>
+              <option value="4K" data-w="3840" data-h="2160">4K &mdash; 3840 &times; 2160</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div id="customSize" class="ctrl-row hidden">
+            <input type="number" id="canvasW" value="600" min="100" max="4096" placeholder="W">
+            <span class="times">&times;</span>
+            <input type="number" id="canvasH" value="600" min="100" max="4096" placeholder="H">
+            <button id="applyCustom" class="btn-sm">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Geometry ── -->
+      <div class="section">
+        <div class="section-head" data-toggle="geoBody">
+          <h3>Geometry</h3>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="geoBody" class="section-body">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Loops</span>
+            <input type="range" id="loops" min="1" max="40" value="8" step="0.5">
+            <span class="val" id="loopsVal">8</span>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">Size</span>
+            <input type="range" id="pointSize" min="0.5" max="20" value="2.3" step="0.1">
+            <span class="val" id="pointSizeVal">2.3</span>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">Density</span>
+            <input type="range" id="density" min="0.005" max="0.2" value="0.031" step="0.001">
+            <span class="val" id="densityVal">0.031</span>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">Radius</span>
+            <input type="range" id="radius" min="10" max="300" value="100" step="1">
+            <span class="val" id="radiusVal">100</span>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">Element</span>
+            <input type="text" id="charVal" value="" placeholder="Leave empty for dot" class="char-input">
+          </div>
+          <p class="hint">Type any character, emoji, or symbol. Empty = dot.</p>
+        </div>
+      </div>
+
+      <!-- ── Animation ── -->
+      <div class="section">
+        <div class="section-head" data-toggle="animBody">
+          <h3>Animation</h3>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="animBody" class="section-body">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Speed</span>
+            <input type="range" id="speed" min="0.05" max="5" value="1" step="0.05">
+            <span class="val" id="speedVal">1.00</span>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">Frames</span>
+            <input type="number" id="loopFrames" value="600" min="60" max="3600" step="10">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Colors ── -->
+      <div class="section">
+        <div class="section-head" data-toggle="colorBody">
+          <h3>Colors</h3>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="colorBody" class="section-body">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Mode</span>
+            <select id="colorMode">
+              <option value="solid">Solid</option>
+              <option value="sinusoidal">Sinusoidal</option>
+            </select>
+          </div>
+          <div id="solidColors">
+            <div class="color-row">
+              <span class="ctrl-label">Element</span>
+              <input type="color" id="elemColor" value="#ffffff">
+            </div>
+            <div class="color-row">
+              <span class="ctrl-label">Background</span>
+              <input type="color" id="bgColor" value="#000000">
+            </div>
+          </div>
+          <div id="sinColors" class="hidden">
+            <div class="ctrl-row">
+              <span class="ctrl-label">R freq</span>
+              <input type="range" id="freqR" min="0.0001" max="0.01" value="0.004" step="0.0001">
+              <span class="val" id="freqRVal">0.004</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">G freq</span>
+              <input type="range" id="freqG" min="0.0001" max="0.01" value="0.005" step="0.0001">
+              <span class="val" id="freqGVal">0.005</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">B freq</span>
+              <input type="range" id="freqB" min="0.0001" max="0.01" value="0.01" step="0.0001">
+              <span class="val" id="freqBVal">0.010</span>
+            </div>
+            <div class="color-row">
+              <span class="ctrl-label">Background</span>
+              <input type="color" id="bgColorSin" value="#000000">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Camera ── -->
+      <div class="section">
+        <div class="section-head" data-toggle="camBody">
+          <h3>Camera</h3>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="camBody" class="section-body">
+          <div class="toggle-row">
+            <span class="ctrl-label">Auto-rotate</span>
+            <label class="switch"><input type="checkbox" id="autoRotate" checked><span class="slider"></span></label>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">Sensitivity</span>
+            <input type="range" id="orbitSens" min="0.1" max="5" value="1" step="0.1">
+            <span class="val" id="orbitSensVal">1.0</span>
+          </div>
+          <button id="resetCam" class="btn-sm full-w">Reset Camera</button>
+          <p class="hint">Drag to rotate &middot; Scroll to zoom</p>
+        </div>
+      </div>
+
+      <!-- ── Export ── -->
+      <div class="section">
+        <div class="section-head" data-toggle="exportBody">
+          <h3>Export</h3>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="exportBody" class="section-body">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Format</span>
+            <select id="exportFmt">
+              <option value="gif">GIF</option>
+              <option value="webm">WebM</option>
+              <option value="png">PNG seq</option>
+              <option value="screenshot">Screenshot</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">FPS</span>
+            <input type="number" id="exportFps" value="30" min="1" max="60">
+          </div>
+          <div class="row">
+            <button id="exportBtn" class="btn accent full-w">Export Loop</button>
+            <button id="exportStop" class="btn full-w hidden">Stop</button>
+          </div>
+          <div id="exportProgress" class="hidden">
+            <div id="exportBar"><div id="exportBarFill"></div></div>
+            <span id="exportStatus">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="footer">Infinorbits</p>
+    </div>
+  </div>
+  <script src="controls.js"></script>
+  <script src="sketch.js"></script>
+</body>
+</html>
