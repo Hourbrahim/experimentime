@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/_tools/infinorbits/">
   <title>Infinorbits</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 </head>
+
 <body>
   <div id="app">
     <div id="canvas-container"></div>
@@ -20,7 +23,10 @@
       <div class="section">
         <div class="section-head" data-toggle="canvasBody">
           <h3>Canvas</h3>
-          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
         <div id="canvasBody" class="section-body">
           <div class="ctrl-row">
@@ -47,7 +53,10 @@
       <div class="section">
         <div class="section-head" data-toggle="geoBody">
           <h3>Geometry</h3>
-          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
         <div id="geoBody" class="section-body">
           <div class="ctrl-row">
@@ -82,7 +91,10 @@
       <div class="section">
         <div class="section-head" data-toggle="animBody">
           <h3>Animation</h3>
-          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
         <div id="animBody" class="section-body">
           <div class="ctrl-row">
@@ -101,7 +113,10 @@
       <div class="section">
         <div class="section-head" data-toggle="colorBody">
           <h3>Colors</h3>
-          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
         <div id="colorBody" class="section-body">
           <div class="ctrl-row">
@@ -149,7 +164,10 @@
       <div class="section">
         <div class="section-head" data-toggle="camBody">
           <h3>Camera</h3>
-          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
         <div id="camBody" class="section-body">
           <div class="toggle-row">
@@ -170,7 +188,10 @@
       <div class="section">
         <div class="section-head" data-toggle="exportBody">
           <h3>Export</h3>
-          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
         <div id="exportBody" class="section-body">
           <div class="ctrl-row">
@@ -191,7 +212,9 @@
             <button id="exportStop" class="btn full-w hidden">Stop</button>
           </div>
           <div id="exportProgress" class="hidden">
-            <div id="exportBar"><div id="exportBarFill"></div></div>
+            <div id="exportBar">
+              <div id="exportBarFill"></div>
+            </div>
             <span id="exportStatus">0%</span>
           </div>
         </div>
@@ -203,4 +226,5 @@
   <script src="controls.js"></script>
   <script src="sketch.js"></script>
 </body>
+
 </html>
