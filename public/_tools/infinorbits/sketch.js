@@ -111,6 +111,11 @@ function drawOrbit(p, t) {
   var lastColor = [255, 255, 255];
 
   for (var i = 0; i <= l1; i += d1) {
+    // cumulative rotations create the 3D toroidal winding
+    // MUST be outside push/pop to accumulate across the whole orbit
+    rotateZ(4.2 * cos(0.00001 * TWO_PI * (t / l1 * r)));
+    rotateY(100 * cos(0.00001 * TWO_PI * (t / l1 * r)));
+
     var cr, cg, cb;
     if (sinCol) {
       cr = 127 + 127 * sin(p.freqR * idx * 100 - t * 4);
@@ -119,22 +124,15 @@ function drawOrbit(p, t) {
       lastColor = [cr, cg, cb];
     }
 
-    push();
-    // cumulative rotations create the 3D toroidal winding
-    rotateZ(4.2 * cos(0.00001 * TWO_PI * (t / l1 * r)));
-    rotateY(100 * cos(0.00001 * TWO_PI * (t / l1 * r)));
-
     var px = r * sin(2 * PI * t + i);
     var py = 0;
     var pz = r * cos(2 * PI * t + i);
 
     if (vertexMode) {
-      // In WEBGL, vertex colors are supported when passed individually, or we can just draw paths
-      // Note: p5 WEBGL doesn't perfectly support auto-gradient lines without custom shaders.
-      // We'll apply stroke color if solid, otherwise we just let the line build. 
       if (sinCol) stroke(cr, cg, cb);
       vertex(px, py, pz);
     } else {
+      push();
       if (sinCol) fill(cr, cg, cb);
       else fill(p.elemColor);
 
@@ -145,8 +143,8 @@ function drawOrbit(p, t) {
       } else {
         ellipse(0, 0, sz, sz);
       }
+      pop();
     }
-    pop();
     idx++;
   }
 
